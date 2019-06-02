@@ -5,4 +5,4 @@ create table profile(
 	email varchar(256),
   department varchar(64),
 	introduction varchar(3000)
-) character set utf8mb4;
+);
