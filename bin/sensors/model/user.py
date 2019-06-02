@@ -3,147 +3,157 @@ from sensors.util import Util
 from sensors.model.flask_user import User as FlaskUser
 from sensors.model.ormutil import ORMUtil
 
+
 class UserModel(object):
-	
-	def __init__(self):
-		pass
 
-	def user_isExist(self, user_id):
-		db = ORMUtil.initDB()
-		User = ORMUtil.getUserORM()
+    def __init__(self):
+        pass
 
-		if (db and User) is None:
-			return None, 100
+    def user_isExist(self, user_id):
+        db = ORMUtil.initDB()
+        User = ORMUtil.getUserORM()
 
-		try:
-			user = db.session.query(User.user_id).filter(User.user_id == user_id).first()
-		except Exception as exc:
-			current_app.logger.critical("user_isExist: Unknown error: %s" % exc)
-			return None, 199
-			
-		if user is None:
-			return False, 0
-		else:
-			return True, 0
+        if (db and User) is None:
+            return None, 100
 
-	def user_register(self, user_id, password):
-		db = ORMUtil.initDB()
-		Authentication = ORMUtil.getAuthenticationORM()
-		User = ORMUtil.getUserORM()
-		UserHash = ORMUtil.getUserHashORM()
-		Profile = ORMUtil.getProfileORM()
+        try:
+            user = db.session.query(User.user_id).filter(
+                User.user_id == user_id).first()
+        except Exception as exc:
+            current_app.logger.critical(
+                "user_isExist: Unknown error: %s" % exc)
+            return None, 199
 
-		if (db and Authentication and User and UserHash and Profile) is None:
-			return None, 100
+        if user is None:
+            return False, 0
+        else:
+            return True, 0
 
-		hmac_key = Util.generateRandomBytes(32)
-		encrypted_password = Util.getEncryptedPassword(hmac_key, password)
-		user_hash = Util.generateUserHash(user_id)
+    def user_register(self, user_id, password):
+        db = ORMUtil.initDB()
+        Authentication = ORMUtil.getAuthenticationORM()
+        User = ORMUtil.getUserORM()
+        UserHash = ORMUtil.getUserHashORM()
+        Profile = ORMUtil.getProfileORM()
 
-		try:
-			db.session.add(Authentication(user_id, encrypted_password, hmac_key))
-			db.session.add(User(user_id, email=None))
-			db.session.add(UserHash(user_id, user_hash))
-			db.session.add(Profile(user_id, nickname=None, icon_path=None, email=None, department=None, introduction=None))
-			db.session.commit()
-		except sqlalchemy.exc.IntegrityError as exc:
-			current_app.logger.critical("user_register: Integrity error: %s" % exc)
-			return None, 110
-		except Exception as exc:
-			current_app.logger.critical("user_register: Unknown error: %s" % exc)
-			return None, 199
+        if (db and Authentication and User and UserHash and Profile) is None:
+            return None, 100
 
-		return "ok", 0
-		
-	def user_delete(self, user_id):
-		db = ORMUtil.initDB()
-		Authentication = ORMUtil.getAuthenticationORM()
-		User = ORMUtil.getUserORM()
-		UserHash = ORMUtil.getUserHashORM()
-		Profile = ORMUtil.getProfileORM()
+        hmac_key = Util.generateRandomBytes(32)
+        encrypted_password = Util.getEncryptedPassword(hmac_key, password)
+        user_hash = Util.generateUserHash(user_id)
 
-		if (db and Authentication and User and Profile) is None:
-			return None, 100
+        try:
+            db.session.add(Authentication(
+                user_id, encrypted_password, hmac_key))
+            db.session.add(User(user_id, email=None))
+            db.session.add(UserHash(user_id, user_hash))
+            db.session.add(Profile(user_id, nickname=None))
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError as exc:
+            current_app.logger.critical(
+                "user_register: Integrity error: %s" % exc)
+            return None, 110
+        except Exception as exc:
+            current_app.logger.critical(
+                "user_register: Unknown error: %s" % exc)
+            return None, 199
 
-		try:
-			db.session.query(Profile).filter(Profile.user_id == user_id).delete()
-			db.session.query(User).filter(User.user_id == user_id).delete()
-			db.session.query(UserHash).filter(UserHash.user_id == user_id).delete()
-			db.session.query(Authentication).filter(Authentication.user_id == user_id).delete()
-			db.session.commit()
-		except Exception as exc:
-			current_app.logger.critical("user_delete: Unknown error: %s" % exc)
-			return None, 199
-		
-		return "ok", 0
+        return "ok", 0
 
-	def user_login(self, user_id, password):
-		db = ORMUtil.initDB()
-		Authentication = ORMUtil.getAuthenticationORM()
-		Profile = ORMUtil.getProfileORM()
+    def user_delete(self, user_id):
+        db = ORMUtil.initDB()
+        Authentication = ORMUtil.getAuthenticationORM()
+        User = ORMUtil.getUserORM()
+        UserHash = ORMUtil.getUserHashORM()
+        Profile = ORMUtil.getProfileORM()
 
-		if (db and Authentication and Profile) is None:
-			return None, 100
+        if (db and Authentication and User and Profile) is None:
+            return None, 100
 
-		try:
-			result = db.session.query(Authentication.hmac_key, Authentication.encrypted_password).filter(Authentication.user_id == user_id).first()
-		except Exception as exc:
-			return None, 122
+        try:
+            db.session.query(Profile).filter(
+                Profile.user_id == user_id).delete()
+            db.session.query(User).filter(User.user_id == user_id).delete()
+            db.session.query(UserHash).filter(
+                UserHash.user_id == user_id).delete()
+            db.session.query(Authentication).filter(
+                Authentication.user_id == user_id).delete()
+            db.session.commit()
+        except Exception as exc:
+            current_app.logger.critical("user_delete: Unknown error: %s" % exc)
+            return None, 199
 
-		if result is None:
-			return None, 121
+        return "ok", 0
 
-		hmac_key = result.hmac_key.encode('ascii')
-		encrypted_password = Util.getEncryptedPassword(hmac_key, password)
+    def user_login(self, user_id, password):
+        db = ORMUtil.initDB()
+        Authentication = ORMUtil.getAuthenticationORM()
+        Profile = ORMUtil.getProfileORM()
 
-		if result.encrypted_password == encrypted_password:
-			try:
-				result = db.session.query(Profile.nickname).filter(Profile.user_id == user_id).first()
-				if result.nickname is None:
-					return FlaskUser(user_id), 0
-				else:
-					return FlaskUser(user_id), 0
-			except Exception as exc:
-				return None, 124
-		else:
-			return None, 123
+        if (db and Authentication and Profile) is None:
+            return None, 100
 
-	def user_list(self, page=None):
-		db = ORMUtil.initDB()
-		Profile = ORMUtil.getProfileORM()
+        try:
+            result = db.session.query(Authentication.hmac_key, Authentication.encrypted_password).filter(
+                Authentication.user_id == user_id).first()
+        except Exception as exc:
+            return None, 122
 
-		if (db and Profile) is None:
-			return None, 100
+        if result is None:
+            return None, 121
 
-		try:
-			result = db.session.query(Profile).all()
-		except Exception as exc:
-			return None, 122
+        hmac_key = result.hmac_key.encode('ascii')
+        encrypted_password = Util.getEncryptedPassword(hmac_key, password)
 
-		users = []
-		for user in result:
-			user_dict = {"user_id": user.user_id, "nickname": user.nickname, "icon_path": user.icon_path, "department": user.department, "introduction": user.introduction}
-			users.append(user_dict)
+        if result.encrypted_password == encrypted_password:
+            try:
+                result = db.session.query(Profile.nickname).filter(
+                    Profile.user_id == user_id).first()
+                if result.nickname is None:
+                    return FlaskUser(user_id), 0
+                else:
+                    return FlaskUser(user_id), 0
+            except Exception as exc:
+                return None, 124
+        else:
+            return None, 123
 
-		return users, 0
+    def user_list(self, page=None):
+        db = ORMUtil.initDB()
+        Profile = ORMUtil.getProfileORM()
 
+        if (db and Profile) is None:
+            return None, 100
 
-	def user_profile(self, user_id):
-		db = ORMUtil.initDB()
-		Profile = ORMUtil.getProfileORM()
+        try:
+            result = db.session.query(Profile).all()
+        except Exception as exc:
+            return None, 122
 
-		if (db and Profile) is None:
-			return None, 100
+        users = []
+        for user in result:
+            user_dict = {"user_id": user.user_id, "nickname": user.nickname}
+            users.append(user_dict)
 
-		try:
-			result = db.session.query(Profile).filter(Profile.user_id == user_id).first()
-		except Exception as exc:
-			return None, 141
+        return users, 0
 
-		if result is None:
-			return None, 142
+    def user_profile(self, user_id):
+        db = ORMUtil.initDB()
+        Profile = ORMUtil.getProfileORM()
 
-		msg = {"user_id": result.user_id, "nickname": result.nickname, "icon_path": result.icon_path, "email": result.email, "department": result.department, "introduction": result.introduction}
-		
-		return msg, 0
-		
+        if (db and Profile) is None:
+            return None, 100
+
+        try:
+            result = db.session.query(Profile).filter(
+                Profile.user_id == user_id).first()
+        except Exception as exc:
+            return None, 141
+
+        if result is None:
+            return None, 142
+
+        msg = {"user_id": result.user_id, "nickname": result.nickname}
+
+        return msg, 0
