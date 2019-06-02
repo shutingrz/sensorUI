@@ -1,5 +1,5 @@
 create table sensor_type(
-	sensor_type integer,
+	sensor_id integer primary key,
     sensor_name varchar(32)
 );
 
