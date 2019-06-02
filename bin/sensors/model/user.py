@@ -42,7 +42,7 @@ class UserModel(object):
 
 		try:
 			db.session.add(Authentication(user_id, encrypted_password, hmac_key))
-			db.session.add(User(user_id, email=None, gift=0, stock=Util.DefaultStockValue))
+			db.session.add(User(user_id, email=None))
 			db.session.add(UserHash(user_id, user_hash))
 			db.session.add(Profile(user_id, nickname=None, icon_path=None, email=None, department=None, introduction=None))
 			db.session.commit()

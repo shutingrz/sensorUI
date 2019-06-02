@@ -72,16 +72,3 @@ class ORMUtil(object):
 			raise Exception(exc)
 
 		return UserHash
-
-	@classmethod
-	def getGiftTransactionORM(self):
-		try:
-			from sensors.db.orm.gift_transaction import GiftTransaction
-		except sqlalchemy.exc.NoSuchTableError as exc:
-			current_app.logger.critical("table is not exist.")
-			return None
-		except Exception as exc:
-			current_app.logger.critical("Unknown OR/M error: %s" % exc)
-			raise Exception(exc)
-
-		return GiftTransaction

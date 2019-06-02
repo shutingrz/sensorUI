@@ -13,15 +13,7 @@ class AccountModel(object):
 		if (db and User) is None:
 			return None, 100
 
-		try:
-			result = db.session.query(User.gift, User.stock).filter(User.user_id == user_id).first()
-		except Exception as exc:
-			return None, 122
-
-		if result is None:
-			return None, 121
-			
-		msg = {"receive Like": result.gift, "stock Like": result.stock}
+		msg = {"removed function"}
 
 		return msg, 0
 
