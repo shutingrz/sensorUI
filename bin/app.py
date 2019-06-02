@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from flask import Flask, Blueprint
-from sensors.controllers.sensors import sensors
 from sensors.controllers.api import api as sensors_api
 from sensors.util import Util
 
@@ -32,7 +31,6 @@ def create_app():
 	Util.DebugMode = app.config["DEBUG_MODE"]
 	Util.InfiniteMode = app.config["INFINITE_MODE"]
 
-	app.register_blueprint(sensors)
 	app.register_blueprint(sensors_api)
 
 	return app
