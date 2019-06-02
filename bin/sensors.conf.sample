@@ -3,7 +3,7 @@ LISTEN = '0.0.0.0'
 PORT = '8002'
 
 #[DB]
-#DBURL = 'mysql+pymysql://{username}:{password}@{host}:{port}/{dbname}?charset=utf8'
+DBURL = 'sqlite:///../sensors.db'
 
 #[System]
 MAX_USERID_LENGTH = 64
