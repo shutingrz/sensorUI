@@ -26,7 +26,7 @@ class ORMUtil(object):
 		try:
 			from sensors.db.orm.authentication import Authentication
 		except sqlalchemy.exc.NoSuchTableError as exc:
-			current_app.logger.critical("table is not exist.")
+			current_app.logger.critical("authentication table is not exist.")
 			return None
 		except Exception as exc:
 			current_app.logger.critical("Unknown OR/M error: %s" % exc)
@@ -39,7 +39,7 @@ class ORMUtil(object):
 		try:
 			from sensors.db.orm.user import User
 		except sqlalchemy.exc.NoSuchTableError as exc:
-			current_app.logger.critical("table is not exist.")
+			current_app.logger.critical("user table is not exist.")
 			return None
 		except Exception as exc:
 			current_app.logger.critical("Unknown OR/M error: %s" % exc)
@@ -52,7 +52,7 @@ class ORMUtil(object):
 		try:
 			from sensors.db.orm.profile import Profile
 		except sqlalchemy.exc.NoSuchTableError as exc:
-			current_app.logger.critical("table is not exist.")
+			current_app.logger.critical("profile table is not exist.")
 			return None
 		except Exception as exc:
 			current_app.logger.critical("Unknown OR/M error: %s" % exc)
@@ -65,7 +65,7 @@ class ORMUtil(object):
 		try:
 			from sensors.db.orm.user_hash import UserHash
 		except sqlalchemy.exc.NoSuchTableError as exc:
-			current_app.logger.critical("table is not exist.")
+			current_app.logger.critical("user_hashtable is not exist.")
 			return None
 		except Exception as exc:
 			current_app.logger.critical("Unknown OR/M error: %s" % exc)

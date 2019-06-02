@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, MetaData, Table
-from sqlalchemy.orm import scoped_session, mapper
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DECIMAL, DATETIME, ForeignKey
+from sqlalchemy.orm import scoped_session, mapper, relationship, backref
 from sqlalchemy.orm.session import sessionmaker
 from flask import Flask, current_app
+from datetime import datetime
 
 database_uri = current_app.config['SQLALCHEMY_DATABASE_URI']
 engine = create_engine(database_uri)

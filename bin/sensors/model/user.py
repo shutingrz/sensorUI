@@ -98,6 +98,7 @@ class UserModel(object):
             result = db.session.query(Authentication.hmac_key, Authentication.encrypted_password).filter(
                 Authentication.user_id == user_id).first()
         except Exception as exc:
+            current_app.logger.critical("user_login: Unknown error: %s" % exc)
             return None, 122
 
         if result is None:
@@ -129,6 +130,7 @@ class UserModel(object):
         try:
             result = db.session.query(Profile).all()
         except Exception as exc:
+            current_app.logger.critical("user_list: Unknown error: %s" % exc)
             return None, 122
 
         users = []
