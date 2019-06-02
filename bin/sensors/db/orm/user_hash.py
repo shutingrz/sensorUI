@@ -1,4 +1,4 @@
-from cheers import db
+from sensors import db
 
 class UserHash(db.Model):
 	def __init__(self, user_id, user_hash):

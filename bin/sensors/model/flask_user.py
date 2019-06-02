@@ -1,4 +1,4 @@
-from cheers.model.ormutil import ORMUtil
+from sensors.model.ormutil import ORMUtil
 
 class User(object):
 	def __init__(self, user_id):

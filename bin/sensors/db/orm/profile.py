@@ -1,4 +1,4 @@
-from cheers import db
+from sensors import db
 
 class Profile(db.Model):
 	def __init__(self, user_id, nickname, icon_path, email, department, introduction):

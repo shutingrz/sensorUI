@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 from flask import Flask, Blueprint
-from cheers.controllers.cheers import cheers
-from cheers.controllers.api import api as cheers_api
-from cheers.util import Util
+from sensors.controllers.sensors import sensors
+from sensors.controllers.api import api as sensors_api
+from sensors.util import Util
 
 def create_app():
 
 	app = Flask(__name__)
 	try:
-		app.config.from_pyfile('./cheers.conf')
+		app.config.from_pyfile('./sensors.conf')
 	except FileNotFoundError as exc:
-		app.logger.critical("'./cheers.conf' is not found.")
+		app.logger.critical("'./sensors.conf' is not found.")
 		raise FileNotFoundError(exc)
 
 	try:
@@ -19,7 +19,7 @@ def create_app():
 		app.config['SQLALCHEMY_DATABASE_URI'] = dburl
 		app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 	except KeyError as exc:
-		app.logger.critical("DBURL is not set. please set dburl at cheers.conf!")
+		app.logger.critical("DBURL is not set. please set dburl at sensors.conf!")
 		raise KeyError(exc)
 	
 	app.config["SECRET_KEY"] = Util.generateRandomBytes(32)
@@ -32,8 +32,8 @@ def create_app():
 	Util.DebugMode = app.config["DEBUG_MODE"]
 	Util.InfiniteMode = app.config["INFINITE_MODE"]
 
-	app.register_blueprint(cheers)
-	app.register_blueprint(cheers_api)
+	app.register_blueprint(sensors)
+	app.register_blueprint(sensors_api)
 
 	return app
 

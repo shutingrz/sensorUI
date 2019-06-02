@@ -1,5 +1,5 @@
 from flask import current_app
-from cheers.model.ormutil import ORMUtil
+from sensors.model.ormutil import ORMUtil
 
 class AccountModel(object):
 	

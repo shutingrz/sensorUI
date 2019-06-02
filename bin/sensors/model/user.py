@@ -1,7 +1,7 @@
 from flask import current_app
-from cheers.util import Util
-from cheers.model.flask_user import User as FlaskUser
-from cheers.model.ormutil import ORMUtil
+from sensors.util import Util
+from sensors.model.flask_user import User as FlaskUser
+from sensors.model.ormutil import ORMUtil
 
 class UserModel(object):
 	

@@ -1,4 +1,4 @@
-from cheers import db
+from sensors import db
 
 class User(db.Model):
 	def __init__(self, user_id, email, gift, stock):

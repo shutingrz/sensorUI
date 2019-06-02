@@ -1,10 +1,10 @@
 import sqlalchemy
 from sqlalchemy import or_
 from flask import current_app
-from cheers.util import Util
-from cheers.model.ormutil import ORMUtil
+from sensors.util import Util
+from sensors.model.ormutil import ORMUtil
 
-class CheersModel(object):
+class SensorsModel(object):
 	
 	def __init__(self):
 		pass

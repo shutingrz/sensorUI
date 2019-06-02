@@ -1,4 +1,4 @@
-from cheers.util import Util
+from sensors.util import Util
 from flask_wtf import FlaskForm
 from wtforms import StringField, validators
 

@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, url_for, request, redirect
 from flask_login import LoginManager, login_user, login_required, current_user
-from cheers.model.cheers import CheersModel
-from cheers.model.user import UserModel
-from cheers.model.account import AccountModel
-from cheers.model.flask_user import User as FlaskUser
-from cheers.util import Util
+from sensors.model.sensors import SensorsModel
+from sensors.model.user import UserModel
+from sensors.model.account import AccountModel
+from sensors.model.flask_user import User as FlaskUser
+from sensors.util import Util
 
-api = Blueprint('cheers_api', __name__, url_prefix='/api/')
+api = Blueprint('sensors_api', __name__, url_prefix='/api/')
 
 login_manager = LoginManager()
 
@@ -184,7 +184,7 @@ def api_user_profile(user_id):
 @api.route('/gift')
 @login_required
 def api_gift():
-	model = CheersModel()
+	model = SensorsModel()
 	sender =  current_user.user_id
 	receiver = request.args.get('destination', None)
 	value = 1
@@ -209,7 +209,7 @@ def api_gift():
 @api.route('/gifts')
 @login_required
 def api_gifts():
-	model = CheersModel()
+	model = SensorsModel()
 	user_id = current_user.user_id
 
 	msg, code = model.gifts(user_id)
@@ -222,7 +222,7 @@ def api_gifts():
 @api.route('/gifts/send')
 @login_required
 def api_gifts_send():
-	model = CheersModel()
+	model = SensorsModel()
 	user_id = current_user.user_id
 
 	msg, code = model.gifts(user_id, "send")
@@ -235,7 +235,7 @@ def api_gifts_send():
 @api.route('/gifts/receive')
 @login_required
 def api_gifts_receive():
-	model = CheersModel()
+	model = SensorsModel()
 	user_id = current_user.user_id
 
 	msg, code = model.gifts(user_id, "receive")

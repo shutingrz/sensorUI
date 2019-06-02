@@ -1,4 +1,4 @@
-from cheers import db
+from sensors import db
 
 class Authentication(db.Model):
 	def __init__(self, user_id, encrypted_password, hmac_key):

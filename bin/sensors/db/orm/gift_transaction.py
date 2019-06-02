@@ -1,4 +1,4 @@
-from cheers import db
+from sensors import db
 
 class GiftTransaction(db.Model):
 	def __init__(self, sender, receiver, value, message, is_anonymous, created_at):
