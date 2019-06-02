@@ -1,0 +1,49 @@
+{% extends "layout/layout.html" %}
+{% block title %}ユーザ一覧{% endblock %}
+
+{% block content %}
+{% for user in user_list %}
+<a href="{{ url_for('cheers.user_profile', user_id=user.user_id) }}" class="userlist card ">
+  <div class="card-block border border-secondary">
+    <div class="row">
+      <div class="col-md-2">
+        <span class="fas fa-user list-icon-size"></span>
+      </div>
+      <div class="col-md-10">
+        <div class="container" style="border-bottom:1px solid black">
+          <h2>
+          {% if user.nickname %}
+            {{ user.nickname }}
+          {% else %}
+            {{ user.user_id }}
+          {% endif %}
+          </h2>
+        </div>
+        <ul class="container details">
+          <li>
+            <p>
+              <i class="fas fa-briefcase fa-fw"></i>
+               {% if user.department %}
+                {{ user.department }}
+               {% else %}
+                (所属未設定)
+               {% endif %}
+            </p>
+          </li>
+          <li>
+            <p>
+              <i class="fas fa-comment-alt fa-fw"></i>
+              {% if user.introduction %}
+                {{ user.introduction }}
+              {% else %}
+                (コメント未設定)
+              {% endif %}
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</a>
+{% endfor %}
+{% endblock %}

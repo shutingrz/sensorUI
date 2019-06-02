@@ -1,0 +1,15 @@
+#[Server]
+LISTEN = '0.0.0.0'
+PORT = '8002'
+
+#[DB]
+#DBURL = 'mysql+pymysql://{username}:{password}@{host}:{port}/{dbname}?charset=utf8'
+
+#[System]
+MAX_USERID_LENGTH = 64
+MAX_USERPASS_LENGTH = 64
+DEFAULT_STOCK_VALUE = 100
+
+#[Debug]
+DEBUG_MODE = True
+INFINITE_MODE = True
