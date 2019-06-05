@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, url_for, request, redirect
+from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from flask_login import LoginManager, login_user, login_required, current_user
 from sensors.model.sensors import SensorsModel
 from sensors.model.user import UserModel
@@ -62,6 +62,8 @@ def api_login():
 
     model = UserModel()
     user, code = model.user_login(user_id, password)
+
+    current_app.logger.debug("user:%s" % user)
 
     if user is None:
         return jsonify(_makeErrorMessage(code))
