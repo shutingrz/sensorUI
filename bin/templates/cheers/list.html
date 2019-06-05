@@ -3,7 +3,7 @@
 
 {% block content %}
 {% for user in user_list %}
-<a href="{{ url_for('sensors.user_profile', user_id=user.user_id) }}" class="userlist card ">
+<a href="{{ url_for(user_id=user.user_id) }}" class="userlist card ">
   <div class="card-block border border-secondary">
     <div class="row">
       <div class="col-md-2">

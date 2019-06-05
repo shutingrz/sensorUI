@@ -64,7 +64,7 @@ def api_login():
 
 #todo. デザインとかできたらPOSTのフォームを受け付けるようにする
 # todo. デザインとかできたらAPIから通常画面にする？
-@api.route('/register')
+@api.route('/register/user')
 def api_user_register():
     user_id = request.args.get('user_id', None)
     password = request.args.get('password', None)
@@ -131,54 +131,6 @@ def api_userid_isExist(user_id):
 def api_account_status():
     model = AccountModel()
     msg, code = model.account_status(current_user.user_id)
-
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
-    else:
-        return jsonify(_makeResponseMessage(msg))
-
-
-'''
-本人からみたプロフィール
-'''
-@api.route('/account/profile')
-@login_required
-def api_account_profile():
-    model = UserModel()
-    msg, code = model.user_profile(current_user.user_id)
-
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
-    else:
-        return jsonify(_makeResponseMessage(msg))
-
-
-'''
-プロフィール保存
-todo. POSTで送信
-'''
-@api.route('/account/profile/save')
-@login_required
-def api_account_save_profile():
-    model = AccountModel()
-    nickname = request.args.get('nickname', None)
-
-    msg, code = model.account_save_profile(
-        current_user.user_id, nickname=nickname)
-
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
-    else:
-        return jsonify(_makeResponseMessage(msg))
-
-
-'''
-みんなからみたプロフィール
-'''
-@api.route('/user/<user_id>')
-def api_user_profile(user_id):
-    model = UserModel()
-    msg, code = model.user_profile(user_id)
 
     if msg is None:
         return jsonify(_makeErrorMessage(code))

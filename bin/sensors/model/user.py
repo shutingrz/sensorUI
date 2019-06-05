@@ -2,6 +2,7 @@ from flask import current_app
 from sensors.util import Util
 from sensors.model.flask_user import User as FlaskUser
 from sensors.model.ormutil import ORMUtil
+import sqlalchemy
 
 
 class UserModel(object):
@@ -34,9 +35,8 @@ class UserModel(object):
         Authentication = ORMUtil.getAuthenticationORM()
         User = ORMUtil.getUserORM()
         UserHash = ORMUtil.getUserHashORM()
-        Profile = ORMUtil.getProfileORM()
 
-        if (db and Authentication and User and UserHash and Profile) is None:
+        if (db and Authentication and User and UserHash) is None:
             return None, 100
 
         hmac_key = Util.generateRandomBytes(32)
@@ -48,7 +48,6 @@ class UserModel(object):
                 user_id, encrypted_password, hmac_key))
             db.session.add(User(user_id, email=None))
             db.session.add(UserHash(user_id, user_hash))
-            db.session.add(Profile(user_id, nickname=None))
             db.session.commit()
         except sqlalchemy.exc.IntegrityError as exc:
             current_app.logger.critical(
@@ -66,14 +65,11 @@ class UserModel(object):
         Authentication = ORMUtil.getAuthenticationORM()
         User = ORMUtil.getUserORM()
         UserHash = ORMUtil.getUserHashORM()
-        Profile = ORMUtil.getProfileORM()
 
-        if (db and Authentication and User and Profile) is None:
+        if (db and Authentication and User) is None:
             return None, 100
 
         try:
-            db.session.query(Profile).filter(
-                Profile.user_id == user_id).delete()
             db.session.query(User).filter(User.user_id == user_id).delete()
             db.session.query(UserHash).filter(
                 UserHash.user_id == user_id).delete()
@@ -89,9 +85,8 @@ class UserModel(object):
     def user_login(self, user_id, password):
         db = ORMUtil.initDB()
         Authentication = ORMUtil.getAuthenticationORM()
-        Profile = ORMUtil.getProfileORM()
 
-        if (db and Authentication and Profile) is None:
+        if (db and Authentication) is None:
             return None, 100
 
         try:
@@ -109,12 +104,7 @@ class UserModel(object):
 
         if result.encrypted_password == encrypted_password:
             try:
-                result = db.session.query(Profile.nickname).filter(
-                    Profile.user_id == user_id).first()
-                if result.nickname is None:
-                    return FlaskUser(user_id), 0
-                else:
-                    return FlaskUser(user_id), 0
+                return FlaskUser(user_id), 0
             except Exception as exc:
                 return None, 124
         else:
@@ -122,40 +112,20 @@ class UserModel(object):
 
     def user_list(self, page=None):
         db = ORMUtil.initDB()
-        Profile = ORMUtil.getProfileORM()
+        User = ORMUtil.getUserORM()
 
-        if (db and Profile) is None:
+        if (db and User) is None:
             return None, 100
 
         try:
-            result = db.session.query(Profile).all()
+            result = db.session.query(User).all()
         except Exception as exc:
             current_app.logger.critical("user_list: Unknown error: %s" % exc)
             return None, 122
 
         users = []
         for user in result:
-            user_dict = {"user_id": user.user_id, "nickname": user.nickname}
+            user_dict = {"user_id": user.user_id}
             users.append(user_dict)
 
         return users, 0
-
-    def user_profile(self, user_id):
-        db = ORMUtil.initDB()
-        Profile = ORMUtil.getProfileORM()
-
-        if (db and Profile) is None:
-            return None, 100
-
-        try:
-            result = db.session.query(Profile).filter(
-                Profile.user_id == user_id).first()
-        except Exception as exc:
-            return None, 141
-
-        if result is None:
-            return None, 142
-
-        msg = {"user_id": result.user_id, "nickname": result.nickname}
-
-        return msg, 0
