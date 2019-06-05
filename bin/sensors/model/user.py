@@ -99,7 +99,7 @@ class UserModel(object):
         if result is None:
             return None, 121
 
-        hmac_key = result.hmac_key.encode('ascii')
+        hmac_key = result.hmac_key
         encrypted_password = Util.getEncryptedPassword(hmac_key, password)
 
         if result.encrypted_password == encrypted_password:

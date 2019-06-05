@@ -15,6 +15,16 @@ login_manager = LoginManager()
 #	login_manager.init_app(state.app)
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    return FlaskUser(user_id)
+
+
+@api.record_once
+def on_load(state):
+    login_manager.init_app(state.app)
+
+
 @api.route('/')
 def api_index():
     return jsonify(list=url_for('.api_user_list'))
