@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
-from flask_login import LoginManager, login_user, login_required, current_user
+from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 from sensors.model.sensors import SensorsModel
 from sensors.model.user import UserModel
 from sensors.model.account import AccountModel
@@ -73,6 +73,13 @@ def api_login():
             return redirect(request.args.get("next") or url_for(".api_index"))
         else:
             return jsonify(_makeErrorMessage(21))
+
+
+@api.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for(".api_index"))
 
 #todo. デザインとかできたらPOSTのフォームを受け付けるようにする
 # todo. デザインとかできたらAPIから通常画面にする？

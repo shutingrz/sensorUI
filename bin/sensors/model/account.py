@@ -14,6 +14,6 @@ class AccountModel(object):
         if (db and User) is None:
             return None, 100
 
-        msg = {"removed function"}
+        msg = {"data": "removed function"}
 
         return msg, 0
