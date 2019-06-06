@@ -16,8 +16,8 @@ login_manager = LoginManager()
 
 
 @login_manager.user_loader
-def load_user(user_id):
-    return FlaskUser(user_id)
+def load_user(user_hash):
+    return FlaskUser(user_hash)
 
 
 @api.record_once
@@ -149,12 +149,35 @@ def api_userid_isExist(user_id):
 @login_required
 def api_account_status():
     model = AccountModel()
-    msg, code = model.account_status(current_user.user_id)
+    msg, code = model.account_status(current_user.user_hash)
 
     if msg is None:
         return jsonify(_makeErrorMessage(code))
     else:
         return jsonify(_makeResponseMessage(msg))
+
+
+@api.route('/register-device')
+@login_required
+def api_device_register():
+
+    device_name = request.args.get('device_name', None)
+    sensor_type = request.args.get('sensor_type', None)
+
+    if device_name is None or sensor_type is None:
+        return jsonify(_makeErrorMessage(11))
+
+    if len(device_name) > Util.MaxUserIdLength:
+        return jsonify(_makeErrorMessage(12))
+
+    model = AccountModel()
+
+    msg, code = model.device_register(current_user.user_id, password)
+
+    if msg is None:
+        return jsonify(_makeErrorMessage(code))
+
+    return jsonify(_makeResponseMessage(msg))
 
 
 def _makeErrorMessage(code):

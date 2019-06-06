@@ -34,9 +34,8 @@ class UserModel(object):
         db = ORMUtil.initDB()
         Authentication = ORMUtil.getAuthenticationORM()
         User = ORMUtil.getUserORM()
-        UserHash = ORMUtil.getUserHashORM()
 
-        if (db and Authentication and User and UserHash) is None:
+        if (db and Authentication and User) is None:
             return None, 100
 
         hmac_key = Util.generateRandomBytes(32)
@@ -45,9 +44,8 @@ class UserModel(object):
 
         try:
             db.session.add(Authentication(
-                user_id, encrypted_password, hmac_key))
-            db.session.add(User(user_id, email=None))
-            db.session.add(UserHash(user_id, user_hash))
+                user_hash, encrypted_password, hmac_key))
+            db.session.add(User(user_id, user_hash, email=None))
             db.session.commit()
         except sqlalchemy.exc.IntegrityError as exc:
             current_app.logger.critical(
@@ -64,17 +62,17 @@ class UserModel(object):
         db = ORMUtil.initDB()
         Authentication = ORMUtil.getAuthenticationORM()
         User = ORMUtil.getUserORM()
-        UserHash = ORMUtil.getUserHashORM()
 
         if (db and Authentication and User) is None:
             return None, 100
 
         try:
-            db.session.query(User).filter(User.user_id == user_id).delete()
-            db.session.query(UserHash).filter(
-                UserHash.user_id == user_id).delete()
+            user_hash = db.session.query(User.user_hash).filter(
+                User.user_id == user_id).first().user_hash
+
+            db.session.query(User).filter(User.user_hash == user_hash).delete()
             db.session.query(Authentication).filter(
-                Authentication.user_id == user_id).delete()
+                Authentication.user_hash == user_hash).delete()
             db.session.commit()
         except Exception as exc:
             current_app.logger.critical("user_delete: Unknown error: %s" % exc)
@@ -85,13 +83,16 @@ class UserModel(object):
     def user_login(self, user_id, password):
         db = ORMUtil.initDB()
         Authentication = ORMUtil.getAuthenticationORM()
+        User = ORMUtil.getUserORM()
 
-        if (db and Authentication) is None:
+        if (db and Authentication and User) is None:
             return None, 100
 
         try:
+            user_hash = db.session.query(User.user_hash).filter(
+                User.user_id == user_id).first().user_hash
             result = db.session.query(Authentication.hmac_key, Authentication.encrypted_password).filter(
-                Authentication.user_id == user_id).first()
+                Authentication.user_hash == user_hash).first()
         except Exception as exc:
             current_app.logger.critical("user_login: Unknown error: %s" % exc)
             return None, 122
@@ -104,7 +105,7 @@ class UserModel(object):
 
         if result.encrypted_password == encrypted_password:
             try:
-                return FlaskUser(user_id), 0
+                return FlaskUser(user_hash), 0
             except Exception as exc:
                 return None, 124
         else:
