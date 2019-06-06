@@ -63,14 +63,13 @@ def api_login():
     model = UserModel()
     user, code = model.user_login(user_id, password)
 
-    current_app.logger.debug("user:%s" % user)
-
     if user is None:
         return jsonify(_makeErrorMessage(code))
     else:
         if user:
             login_user(user)
-            return redirect(request.args.get("next") or url_for(".api_index"))
+            msg = "login successful"
+            return jsonify(_makeResponseMessage(msg))
         else:
             return jsonify(_makeErrorMessage(21))
 
@@ -79,7 +78,8 @@ def api_login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for(".api_index"))
+    msg = "logout successful"
+    return jsonify(_makeResponseMessage(msg))
 
 #todo. デザインとかできたらPOSTのフォームを受け付けるようにする
 # todo. デザインとかできたらAPIから通常画面にする？
