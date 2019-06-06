@@ -27,7 +27,7 @@ def create_app():
     app.config['JSON_AS_ASCII'] = False
     app.config['WTF_CSRF_ENABLED'] = False
 
-    Util.MaxUserIdLength = app.config["MAX_USERID_LENGTH"]
+    Util.MaxUsernameLength = app.config["MAX_USERID_LENGTH"]
     Util.MaxUserPassLength = app.config["MAX_USERPASS_LENGTH"]
     Util.DefaultStockValue = app.config["DEFAULT_STOCK_VALUE"]
     Util.DebugMode = app.config["DEBUG_MODE"]

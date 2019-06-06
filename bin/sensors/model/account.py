@@ -7,7 +7,7 @@ class AccountModel(object):
     def __init__(self):
         pass
 
-    def account_status(self, user_id):
+    def account_status(self, user_hash):
         db = ORMUtil.initDB()
         User = ORMUtil.getUserORM()
 

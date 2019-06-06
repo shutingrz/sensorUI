@@ -51,17 +51,17 @@ def api_user_detail():
 
 @api.route('/login')
 def api_login():
-    user_id = request.args.get('user_id', None)
+    username = request.args.get('username', None)
     password = request.args.get('password', None)
 
-    if user_id is None or password is None:
+    if username is None or password is None:
         return jsonify(_makeErrorMessage(11))
 
-    if len(user_id) > Util.MaxUserIdLength or len(password) > Util.MaxUserPassLength:
+    if len(username) > Util.MaxUsernameLength or len(password) > Util.MaxUserPassLength:
         return jsonify(_makeErrorMessage(12))
 
     model = UserModel()
-    user, code = model.user_login(user_id, password)
+    user, code = model.user_login(username, password)
 
     if user is None:
         return jsonify(_makeErrorMessage(code))
@@ -85,22 +85,22 @@ def logout():
 # todo. デザインとかできたらAPIから通常画面にする？
 @api.route('/register/user')
 def api_user_register():
-    user_id = request.args.get('user_id', None)
+    username = request.args.get('username', None)
     password = request.args.get('password', None)
 
-    if user_id is None or password is None:
+    if username is None or password is None:
         return jsonify(_makeErrorMessage(11))
 
-    if len(user_id) > Util.MaxUserIdLength or len(password) > Util.MaxUserPassLength:
+    if len(username) > Util.MaxUsernameLength or len(password) > Util.MaxUserPassLength:
         return jsonify(_makeErrorMessage(12))
 
     model = UserModel()
 
     # get first element, because user_isExist returns "True/False, code".
-    if model.user_isExist(user_id)[0]:
+    if model.user_isExist(username)[0]:
         return jsonify(_makeErrorMessage(13))
 
-    msg, code = model.user_register(user_id, password)
+    msg, code = model.user_register(username, password)
 
     if msg is None:
         return jsonify(_makeErrorMessage(code))
@@ -110,15 +110,15 @@ def api_user_register():
 
 # ユーザ削除, デバッグ用のためユーザ認証は不要.
 # todo. 本番運用時は削除!!
-@api.route('/admin/user/delete/<user_id>')
-def api_admin_user_delete(user_id):
+@api.route('/admin/user/delete/<username>')
+def api_admin_user_delete(username):
     if Util.DebugMode is False:
         return jsonify(_makeErrorMessage(0))
 
     model = UserModel()
 
-    if model.user_isExist(user_id)[0]:
-        msg, code = model.user_delete(user_id)
+    if model.user_isExist(username)[0]:
+        msg, code = model.user_delete(username)
 
         if msg is None:
             return jsonify(_makeErrorMessage(code))
@@ -134,10 +134,10 @@ api_userid_isExist
 
 todo: ブルートフォース攻撃対策
 '''
-@api.route('/user/<user_id>/isexist')
-def api_userid_isExist(user_id):
+@api.route('/user/<username>/isexist')
+def api_userid_isExist(username):
     model = UserModel()
-    msg, code = model.user_isExist(user_id)
+    msg, code = model.user_isExist(username)
 
     if msg is None:
         return jsonify(_makeErrorMessage(code))
@@ -167,12 +167,12 @@ def api_device_register():
     if device_name is None or sensor_type is None:
         return jsonify(_makeErrorMessage(11))
 
-    if len(device_name) > Util.MaxUserIdLength:
+    if len(device_name) > Util.MaxUsernameLength:
         return jsonify(_makeErrorMessage(12))
 
     model = AccountModel()
 
-    msg, code = model.device_register(current_user.user_id, password)
+    msg, code = model.device_register(current_user.username, password)
 
     if msg is None:
         return jsonify(_makeErrorMessage(code))

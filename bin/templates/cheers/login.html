@@ -12,8 +12,8 @@
       {% if description %}
         <font color="red">{{ description }}</font>
       {% endif %}
-      <label for="user_id" class="sr-only">ユーザID</label>
-      <input type="text" id="user_id" name="user_id" class="form-control" value="{{ form.user_id.data }}" placeholder="ユーザID" required autofocus>
+      <label for="username" class="sr-only">ユーザID</label>
+      <input type="text" id="username" name="username" class="form-control" value="{{ form.username.data }}" placeholder="ユーザID" required autofocus>
       <label for="inputPassword" class="sr-only">パスワード</label>
       <input type="password" id="inputPassword" name="password" class="form-control" value="{{ form.password.data }}" placeholder="パスワード" required>
       <div class="checkbox mb-3">
