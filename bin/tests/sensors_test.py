@@ -10,6 +10,7 @@ class TestSensorsAPI(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
+        
 
     def test_health(self):
         rv = self.app.get("/api/")

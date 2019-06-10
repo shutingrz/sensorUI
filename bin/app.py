@@ -4,10 +4,10 @@ from flask import Flask, Blueprint
 from sensors.controllers.api import api as sensors_api
 from sensors.util import Util
 
-
 def create_app():
 
     app = Flask(__name__)
+
     try:
         app.config.from_pyfile('./sensors.conf')
     except FileNotFoundError as exc:
@@ -34,10 +34,11 @@ def create_app():
     Util.InfiniteMode = app.config["INFINITE_MODE"]
 
     app.register_blueprint(sensors_api)
+    
 
     return app
 
+app = create_app()
 
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True, host=app.config['LISTEN'], port=app.config['PORT'])
