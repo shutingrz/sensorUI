@@ -88,5 +88,17 @@ class ORMUtil(object):
 
         return SensorType
 
+    @classmethod
+    def getSensorTemperatureORM(self):
+        try:
+            from sensors.db.orm.sensor_temperature import SensorTemperature
+        except sqlalchemy.exc.NoSuchTableError as exc:
+            current_app.logger.critical("sensor_temperature table is not exist.")
+            return None
+        except Exception as exc:
+            current_app.logger.critical("Unknown OR/M error: %s" % exc)
+            raise Exception(exc)
+
+        return SensorTemperature
     
     

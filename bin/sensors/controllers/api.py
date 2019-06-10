@@ -171,8 +171,42 @@ def api_device_register():
 
     if msg is None:
         return jsonify(_makeErrorMessage(code))
+    else:
+        return jsonify(_makeResponseMessage(msg))
 
-    return jsonify(_makeResponseMessage(msg))
+
+@api.route('/device/temperature/<device_id>')
+@login_required
+def api_device_temperature_view(device_id):
+
+    model = SensorTemperatureModel()
+
+    msg, code = model.view(current_user.user_hash, device_id)
+
+    if msg is None:
+        return jsonify(_makeErrorMessage(code))
+    else:
+        return jsonify(_makeResponseMessage(msg))
+
+
+@api.route('/record/temperature')
+def api_record_temperature():
+
+    api_key = request.args.get("api_key", None)
+    time = request.args.get("time", None)
+    value = request.args.get("value", None)
+
+    if api_key is None or time is None or value is None:
+        return jsonify(_makeErrorMessage(11))
+    
+    model = SensorTemperatureModel()
+
+    msg, code = model.record(api_key, time, value)
+
+    if msg is None:
+        return jsonify(_makeErrorMessage(code))
+    else:
+        return jsonify(_makeResponseMessage(msg))
 
 
 def _makeErrorMessage(code):
