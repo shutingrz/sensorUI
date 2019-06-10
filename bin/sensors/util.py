@@ -20,6 +20,12 @@ class Util():
         return rand_bytes
 
     @classmethod
+    def generateRandomString(self, length, seq=string.digits + string.ascii_lowercase):
+        rand_str = ''.join(secrets.choice(
+            string.ascii_letters + string.digits) for i in range(length))
+        return rand_str
+
+    @classmethod
     def getEncryptedPassword(self, key, password):
         password_bytes = password.encode('utf-8')
         return hmac.new(key, password_bytes, hashlib.sha256).hexdigest()
@@ -30,3 +36,4 @@ class Util():
         username_bytes = username.encode('utf-8')
         userHash = hmac.new(key, username_bytes, hashlib.md5).hexdigest()
         return userHash
+

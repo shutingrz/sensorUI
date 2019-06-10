@@ -3,6 +3,7 @@ from flask_login import LoginManager, login_user, login_required, current_user, 
 from sensors.model.sensors import SensorsModel
 from sensors.model.user import UserModel
 from sensors.model.account import AccountModel
+from sensors.model.device import DeviceModel
 from sensors.model.flask_user import User as FlaskUser
 from sensors.util import Util
 
@@ -157,7 +158,7 @@ def api_account_status():
         return jsonify(_makeResponseMessage(msg))
 
 
-@api.route('/register-device')
+@api.route('/register/device')
 @login_required
 def api_device_register():
 
@@ -172,7 +173,7 @@ def api_device_register():
 
     model = AccountModel()
 
-    msg, code = model.device_register(current_user.username, password)
+    msg, code = model.device_register(current_user.user_hash, device_name, sensor_type)
 
     if msg is None:
         return jsonify(_makeErrorMessage(code))

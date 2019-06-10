@@ -60,3 +60,33 @@ class ORMUtil(object):
             raise Exception(exc)
 
         return UserHash
+
+    @classmethod
+    def getDeviceORM(self):
+        try:
+            from sensors.db.orm.device import Device
+        except sqlalchemy.exc.NoSuchTableError as exc:
+            current_app.logger.critical("device table is not exist.")
+            return None
+        except Exception as exc:
+            current_app.logger.critical("Unknown OR/M error: %s" % exc)
+            raise Exception(exc)
+
+        return Device
+
+    
+    @classmethod
+    def getSensorTypeORM(self):
+        try:
+            from sensors.db.orm.sensor_type import SensorType
+        except sqlalchemy.exc.NoSuchTableError as exc:
+            current_app.logger.critical("sensor_type table is not exist.")
+            return None
+        except Exception as exc:
+            current_app.logger.critical("Unknown OR/M error: %s" % exc)
+            raise Exception(exc)
+
+        return SensorType
+
+    
+    
