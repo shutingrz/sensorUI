@@ -103,10 +103,11 @@ class TestUserControl(unittest.TestCase):
         json_data = rv.get_json()
         assert json_data["header"]["status"] == "success"
 
+
     def test_auth_test(self):
 
         rv = self.app.get("/api/account/status")
-        print(rv)
+        print(rv.status_code)
 
 
 
