@@ -28,8 +28,8 @@ def on_load(state):
 
 @api.route('/')
 def api_index():
-    return jsonify(list=url_for('.api_user_list'))
-
+    msg = "Sensors"
+    return jsonify(_makeResponseMessage(msg))
 
 @api.route('/list')
 def api_user_list():
@@ -43,12 +43,6 @@ def api_user_list():
         return jsonify(_makeErrorMessage(code))
     else:
         return jsonify(_makeResponseMessage(msg))
-
-
-@api.route('/user/detail/<id>')
-def api_user_detail():
-    pass
-
 
 @api.route('/login')
 def api_login():
