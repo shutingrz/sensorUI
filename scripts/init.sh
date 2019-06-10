@@ -20,7 +20,7 @@ cd ${SCRIPT_DIR}
 dbfile=../$1
 
 # Create Database
-rm ${dbfile} 2&>/dev/null
+rm ${dbfile} >/dev/null 2>&1
 
 if [ ! -e ${dbfile} ];then
   echo ".open ${dbfile}" | sqlite3
