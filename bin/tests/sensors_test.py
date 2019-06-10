@@ -12,7 +12,7 @@ class TestSensorsAPI(unittest.TestCase):
         self.app = app.test_client()
 
     def test_health(self):
-        rv = self.app.get("/api")
+        rv = self.app.get("/api/")
         print(rv.data)
 
 if __name__ == '__main__':
