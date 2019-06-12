@@ -13,11 +13,21 @@ class SensorTemperatureModel(object):
     def view(self, user_hash, device_id):
         db = ORMUtil.initDB()
         Temperature = ORMUtil.getSensorTemperatureORM()
+        Device = ORMUtil.getDeviceORM()
 
-        if (db and Temperature) is None:
+        if (db and Temperature and Device) is None:
             return None, 100
         
         try:
+            devicelist = db.session.query(Device.device_id)\
+                                .filter(Device.user_hash == user_hash)\
+                                .filter(Device.device_id == device_id)\
+                                .all()
+
+            if not devicelist :
+                msg = "this device is not yours"
+                return msg, 110
+
             result = db.session.query(Temperature)\
                                 .filter(Temperature.device_id == device_id)\
                                 .order_by(desc(Temperature.time))\

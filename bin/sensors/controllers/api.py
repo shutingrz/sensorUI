@@ -184,8 +184,8 @@ def api_device_temperature_view(device_id):
 
     msg, code = model.view(current_user.user_hash, device_id)
 
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
+    if msg is None or code != 0:
+        return jsonify(_makeErrorMessage(code, msg))
     else:
         return jsonify(_makeResponseMessage(msg))
 
@@ -204,14 +204,14 @@ def api_record_temperature():
 
     msg, code = model.record(api_key, time, value)
 
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
+    if msg is None or code != 0:
+        return jsonify(_makeErrorMessage(code, msg))
     else:
         return jsonify(_makeResponseMessage(msg))
 
 
-def _makeErrorMessage(code):
-    data = {'header': {'status': 'error', 'errorCode': code}, 'response': {}}
+def _makeErrorMessage(code, msg = {}):
+    data = {'header': {'status': 'error', 'errorCode': code}, 'response': msg}
     return data
 
 
