@@ -64,3 +64,9 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for(".index"))
+
+
+@webui.route('/register/user', methods=("GET", "POST"))
+def user_register():
+
+    return render_template('webui/user_register.html', form=form)
