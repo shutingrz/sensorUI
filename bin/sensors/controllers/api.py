@@ -4,6 +4,7 @@ from sensors.model.sensors import SensorsModel
 from sensors.model.user import UserModel
 from sensors.model.account import AccountModel
 from sensors.model.device import DeviceModel
+from sensors.model.sensor_temperature import SensorTemperatureModel
 from sensors.model.flask_user import User as FlaskUser
 from sensors.util import Util
 

@@ -73,7 +73,12 @@ class AccountModel(object):
             current_app.logger.critical("Unknown error: %s" % exc)
             return None, 199
         
-        return "ok", 0
+        device_dict = { "device_name": device_name,
+                        "device_id": device_id,
+                        "sensor_type": sensor_type,
+                        "api_key": api_key}
+
+        return device_dict, 0
 
 
 
