@@ -105,7 +105,7 @@ class UserModel(object):
 
         if result.encrypted_password == encrypted_password:
             try:
-                return FlaskUser(user_hash), 0
+                return FlaskUser(username, user_hash), 0
             except Exception as exc:
                 return None, 124
         else:

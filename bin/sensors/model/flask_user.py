@@ -2,8 +2,11 @@ from sensors.model.ormutil import ORMUtil
 
 
 class User(object):
-    def __init__(self, user_hash):
+    def __init__(self, user_hash, username=None):
         self.user_hash = user_hash
+
+        if username is not None:
+            self.username = username
 
     def is_authenticated(self):
         return True
@@ -16,3 +19,9 @@ class User(object):
 
     def get_id(self):
         return self.user_hash
+
+    def get_username(self):
+        if self.username is None:
+            return "名無し"
+        else:
+            return self.username

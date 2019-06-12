@@ -2,7 +2,9 @@
 
 from flask import Flask, Blueprint
 from sensors.controllers.api import api as sensors_api
+from sensors.controllers.webui import webui
 from sensors.util import Util
+
 
 def create_app(DBURL=None):
 
@@ -19,7 +21,7 @@ def create_app(DBURL=None):
             dburl = DBURL
         else:
             dburl = app.config['DBURL']
-            
+
         app.config['SQLALCHEMY_DATABASE_URI'] = dburl
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     except KeyError as exc:
@@ -38,9 +40,10 @@ def create_app(DBURL=None):
     Util.InfiniteMode = app.config["INFINITE_MODE"]
 
     app.register_blueprint(sensors_api)
-    
+    app.register_blueprint(webui)
 
     return app
+
 
 app = create_app()
 
