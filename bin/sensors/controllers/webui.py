@@ -17,10 +17,16 @@ webui = Blueprint('webui', __name__, url_prefix='/')
 
 login_manager = LoginManager()
 
-# username
+# flask-login用
 @login_manager.user_loader
 def load_user(user_hash):
-    return FlaskUser(user_hash)
+    model = UserModel()
+    username = model.getUsername(user_hash)
+
+    if username is None:
+        return FlaskUser(user_hash, "名無し")
+    else:
+        return FlaskUser(user_hash, username)
 
 
 @webui.record_once

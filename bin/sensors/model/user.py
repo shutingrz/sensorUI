@@ -105,11 +105,27 @@ class UserModel(object):
 
         if result.encrypted_password == encrypted_password:
             try:
-                return FlaskUser(username, user_hash), 0
+                return FlaskUser(user_hash, username), 0
             except Exception as exc:
                 return None, 124
         else:
             return None, 123
+
+    def getUsername(self, user_hash):
+        db = ORMUtil.initDB()
+        User = ORMUtil.getUserORM()
+
+        if (db and User) is None:
+            return None
+
+        try:
+            username = db.session.query(User.username).filter(
+                User.user_hash == user_hash).first().username
+        except Exception as exc:
+            current_app.logger.critical("getUsername: Unknown error: %s" % exc)
+            return None
+
+        return username
 
     def user_list(self, page=None):
         db = ORMUtil.initDB()
