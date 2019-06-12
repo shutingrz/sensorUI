@@ -6,7 +6,7 @@ SCHEMA_DIR=${SCRIPT_DIR}/../bin/sensors/db/sql
 if [ $# -ne 1 ];then
   cat <<_EOS_
 Usage
-  $0 databasefile
+  $0 databasefile_path
 _EOS_
 exit -1
 fi
@@ -16,8 +16,7 @@ if [ ! -x $(which sqlite3) ];then
   exit -1
 fi
 
-cd ${SCRIPT_DIR}
-dbfile=../$1
+dbfile=$1
 
 # Create Database
 rm ${dbfile} >/dev/null 2>&1

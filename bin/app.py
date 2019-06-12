@@ -4,7 +4,7 @@ from flask import Flask, Blueprint
 from sensors.controllers.api import api as sensors_api
 from sensors.util import Util
 
-def create_app():
+def create_app(DBURL=None):
 
     app = Flask(__name__)
 
@@ -15,7 +15,11 @@ def create_app():
         raise FileNotFoundError(exc)
 
     try:
-        dburl = app.config['DBURL']
+        if DBURL is not None:
+            dburl = DBURL
+        else:
+            dburl = app.config['DBURL']
+            
         app.config['SQLALCHEMY_DATABASE_URI'] = dburl
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     except KeyError as exc:

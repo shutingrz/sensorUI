@@ -1,25 +1,25 @@
 import unittest
 import os,sys
 import json
+import tempfile
 from flask import Flask
 import subprocess
 import app as sensors_app
 import time
 
 #ここなんとかしたい・・・
-dburl = "sqlite:///../sensors.db"
-db_name = os.path.basename(dburl)
-result = subprocess.run(["/bin/bash", "-c", "../scripts/init.sh %s" % db_name])        
+tempDB = tempfile.mkstemp()
+tempDBPath = tempDB[1]
+dburl = "sqlite:///" + tempDBPath
+result = subprocess.run(["/bin/bash", "-c", "../scripts/init.sh %s" % tempDBPath])        
 time.sleep(1)
 
-
-app = sensors_app.create_app()
+app = sensors_app.create_app(dburl)
 
 class TestUserControl(unittest.TestCase):
 
     def setUp(self):        
         self.app = app.test_client()
-
 
     def test_health(self):
         rv = self.app.get("/api/")
@@ -48,15 +48,6 @@ class TestUserControl(unittest.TestCase):
         rv = self.app.get("/api/user/%s/isexist" % testuser["name"])
         json_data = rv.get_json()
         assert json_data["response"] == True
-        
-        #delete
-        rv = self.app.get("/api/admin/user/delete/%s" % testuser["name"])
-        json_data = rv.get_json()
-
-        #isexist
-        rv = self.app.get("/api/user/%s/isexist" % testuser["name"])
-        json_data = rv.get_json()
-        assert json_data["response"] == False
 
 
     def test_admin_user_delete(self):
@@ -223,10 +214,6 @@ class TestAccountControl(unittest.TestCase):
         json_data = rv.get_json()
         assert json_data["header"]["status"] == "success"
 
-
-
-
-    
 
 
 if __name__ == '__main__':
