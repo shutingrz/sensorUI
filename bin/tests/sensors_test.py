@@ -26,14 +26,15 @@ class TestUserControl(unittest.TestCase):
 
     def test_health(self):
         rv = self.app.get("/api/")
-        assert b"Sensors" in rv.data
+        self.assertIn(b"Sensors", rv.data)
 
     def test_user_isexist(self):
         testuser = {"name": "test_user_isexist", "password": "testtest"}
 
         rv = self.app.get("/api/user/%s/isexist" % testuser["name"])
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+
+        self.assertEqual(json_data["header"]["status"], "success")
 
     def test_user_register(self):
         testuser = {"name": "test_user_register", "password": "testtest"}
@@ -44,12 +45,12 @@ class TestUserControl(unittest.TestCase):
             password=testuser["password"]
         ))
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
         # isexist
         rv = self.app.get("/api/user/%s/isexist" % testuser["name"])
         json_data = rv.get_json()
-        assert json_data["response"] == True
+        self.assertTrue(json_data["response"])
 
     def test_admin_user_delete(self):
         testuser = {"name": "test_admin_user_delete", "password": "testtest"}
@@ -60,12 +61,12 @@ class TestUserControl(unittest.TestCase):
             password=testuser["password"]
         ))
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
         # isexist
         rv = self.app.get("/api/user/%s/isexist" % testuser["name"])
         json_data = rv.get_json()
-        assert json_data["response"] == True
+        self.assertTrue(json_data["response"])
 
         # delete
         rv = self.app.get("/api/admin/user/delete/%s" % testuser["name"])
@@ -74,7 +75,7 @@ class TestUserControl(unittest.TestCase):
         # isexist
         rv = self.app.get("/api/user/%s/isexist" % testuser["name"])
         json_data = rv.get_json()
-        assert json_data["response"] == False
+        self.assertFalse(json_data["response"])
 
     def test_user_login(self):
         testuser = {"name": "test_user_login", "password": "testtest"}
@@ -85,7 +86,7 @@ class TestUserControl(unittest.TestCase):
             password=testuser["password"]
         ))
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
         # login
         rv = self.app.get("/api/login", query_string=dict(
@@ -93,7 +94,7 @@ class TestUserControl(unittest.TestCase):
             password=testuser["password"]
         ))
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
     def test_auth_test(self):
 
@@ -101,7 +102,7 @@ class TestUserControl(unittest.TestCase):
 
         # access login required page without session
         rv = self.app.get("/api/account/status")
-        assert rv.status_code == 401
+        self.assertEqual(rv.status_code, 401)
 
         # register
         rv = self.app.get("/api/register/user", query_string=dict(
@@ -109,7 +110,7 @@ class TestUserControl(unittest.TestCase):
             password=testuser["password"]
         ))
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
         # login
         rv = self.app.get("/api/login", query_string=dict(
@@ -117,17 +118,17 @@ class TestUserControl(unittest.TestCase):
             password=testuser["password"]
         ))
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
         session = rv.headers["Set-Cookie"]
-        assert "session" in session
+        self.assertIn("session", session)
 
         # access login required page with session
         rv = self.app.get("/api/account/status", headers={"Cookie": session})
-        assert rv.status_code == 200
+        self.assertEqual(rv.status_code, 200)
 
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
 
 class TestAccountControl(unittest.TestCase):
@@ -168,19 +169,19 @@ class TestAccountControl(unittest.TestCase):
                               sensor_type=testdevice["sensor_type"]
                           ))
 
-        assert rv.status_code == 200
+        self.assertEqual(rv.status_code, 200)
 
         json_data = rv.get_json()
 
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
         # get device list
         rv = self.app.get("/api/account/status",
                           headers={"Cookie": self.session})
-        assert rv.status_code == 200
+        self.assertEqual(rv.status_code, 200)
 
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
     def test_temperature_view(self):
 
@@ -193,22 +194,22 @@ class TestAccountControl(unittest.TestCase):
                               sensor_type=testdevice["sensor_type"]
                           ))
 
-        assert rv.status_code == 200
+        self.assertEqual(rv.status_code, 200)
 
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
         device_id = json_data["response"]["device_id"]
-        assert device_id is not None
+        self.assertIsNotNone(device_id)
 
         # device view
         rv = self.app.get("/api/device/temperature/%s" % device_id,
                           headers={"Cookie": self.session})
 
-        assert rv.status_code == 200
+        self.assertEqual(rv.status_code, 200)
 
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
     def test_temperature_record(self):
         from datetime import datetime
@@ -220,7 +221,7 @@ class TestAccountControl(unittest.TestCase):
         now = datetime.now()
         basetime = int(now.timestamp())
 
-        for i in range(0, 11):
+        for i in range(0, 11):  # prepare 11 records
             record = {
                 "time": basetime + i*60,
                 "value": str(20+i)
@@ -234,15 +235,15 @@ class TestAccountControl(unittest.TestCase):
                               sensor_type=testdevice["sensor_type"]
                           ))
 
-        assert rv.status_code == 200
+        self.assertEqual(rv.status_code, 200)
 
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
         api_key = json_data["response"]["api_key"]
         device_id = json_data["response"]["device_id"]
-        assert api_key is not None
-        assert device_id is not None
+        self.assertIsNotNone(api_key)
+        self.assertIsNotNone(device_id)
 
         # temperature record
         for record in test_records:
@@ -253,24 +254,22 @@ class TestAccountControl(unittest.TestCase):
                 value=record["value"]
             ))
 
-            assert rv.status_code == 200
+            self.assertEqual(rv.status_code, 200)
             json_data = rv.get_json()
-            assert json_data["header"]["status"] == "success"
+            self.assertEqual(json_data["header"]["status"], "success")
 
         # device view
         rv = self.app.get("/api/device/temperature/%s" % device_id,
                           headers={"Cookie": self.session})
 
-        assert rv.status_code == 200
+        self.assertEqual(rv.status_code, 200)
 
         json_data = rv.get_json()
-        assert json_data["header"]["status"] == "success"
+        self.assertEqual(json_data["header"]["status"], "success")
 
         # max 10 records check
         res_records = json_data["response"]
-        assert len(res_records) < 11
-
-        print(json_data)
+        self.assertLess(len(res_records), 11)
 
 
 if __name__ == '__main__':
