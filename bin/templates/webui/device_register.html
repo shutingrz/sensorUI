@@ -4,34 +4,35 @@
 
 {% block contents %}
 <!-- respected for https://codepen.io/modifiers/details/bKbjNO -->
-<div class="">
-  <div class="uk-width-1-1">
-    <div class="uk-container">
-      <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>
-        <div class="uk-width-1-1@m">
-          <div class="uk-margin uk-width-large uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
-            {% if description %}
-            <span class="uk-text-danger">{{ description }}</span>
-            {% endif %}
-            <form method="POST" action="{{ url_for('webui.device_register') }}">
-              <div class="uk-margin">
-                <div class="uk-inline uk-width-1-1">
-                  <span class="uk-form-icon" uk-icon="icon: rss"></span>
-                  <input class="uk-input uk-form-large" name="device_name" type="text" value="" placeholder="Set a devicename" required>
-                </div>
+<div class="uk-width-1-1">
+  <div class="uk-container">
+    <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>
+      <div class="uk-width-1-1@m">
+        <div class="uk-margin uk-width-large uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
+          {% if description %}
+          <span class="uk-text-danger">{{ description }}</span>
+          {% endif %}
+          <form method="POST" action="{{ url_for('webui.device_register') }}">
+            {{ form.csrf_token }}
+            <div class="uk-margin">
+              <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: rss"></span>
+                <input class="uk-input uk-form-large" name="device_name" type="text" value="" placeholder="Set a devicename" required>
               </div>
-              <div class="uk-margin">
-                <div class="uk-form-controls">
-                  <select class="uk-select" id="form-stacked-select">
-                    <option>Temperature</option>
-                  </select>
-                </div>
+            </div>
+            <div class="uk-margin">
+              <div class="uk-form-controls">
+                <select class="uk-select" name="sensor_type" id="form-stacked-select">
+                  {% for type in form.sensor_type %}
+                  {{ type }}"
+                  {% endfor %}
+                </select>
               </div>
-              <div class="uk-margin">
-                <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" type="submit">Register</button>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div class="uk-margin">
+              <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" type="submit">Register</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

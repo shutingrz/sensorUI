@@ -5,10 +5,10 @@ from wtforms import StringField, validators
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 from sensors.controllers import forms
-from sensors.model.sensors import SensorsModel
 from sensors.model.user import UserModel
 from sensors.model.account import AccountModel
 from sensors.model.device import DeviceModel
+from sensors.model.sensor import SensorModel
 from sensors.model.sensor_temperature import SensorTemperatureModel
 from sensors.model.flask_user import User as FlaskUser
 from sensors.util import Util
@@ -58,7 +58,7 @@ def login():
 
             if user:
                 login_user(user)
-                return redirect(request.args.get('next') or url_for(".device_list"))
+                return redirect(request.args.get('next') or url_for("webui.device_list"))
             else:
                 return render_template('webui/login.html',
                 login_description="ユーザIDまたはパスワードが違います。",
@@ -116,7 +116,42 @@ def device_list():
     return render_template('webui/device_list.html')
 
 
-@webui.route('/register-device')
+@webui.route('/register-device', methods=("GET", "POST"))
 @login_required
 def device_register():
-    return render_template('webui/device_register.html')
+    sensorModel = SensorModel()
+    form = forms.DeviceRegisterForm(request.form)
+
+    sensorTypes, code = sensorModel.getSensorType()
+    if code != 0:
+        return render_template('webui/device_register.html',
+            description="センサータイプの取得に失敗しました: %s" % sensorTypes,
+            form=form)
+
+    sensorType = [(i["id"], i["name"]) for i in sensorTypes]
+    form.sensor_type.choices = sensorType
+
+    if request.method == 'GET':
+        return render_template('webui/device_register.html', form=form)
+
+    if request.method == 'POST':
+        if form.validate():
+            device_name = form.device_name.data
+            sensor_type = form.sensor_type.data
+
+            model = AccountModel()
+
+            msg, code = model.device_register(current_user.user_hash, device_name, sensor_type)
+
+            if code == 0:
+                return redirect(url_for("webui.device_list"))
+            else:
+                return render_template('webui/device_register.html',
+                    description="デバイス登録に失敗しました: %s" % msg,
+                    form=form)            
+        else:
+            return render_template('webui/device_register.html',
+                description="フォームがあかん",
+                form=form)
+
+    

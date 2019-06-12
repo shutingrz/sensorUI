@@ -1,6 +1,6 @@
 from sensors.util import Util
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, validators
+from wtforms import StringField, PasswordField, SelectField, validators
 
 
 class LoginForm(FlaskForm):
@@ -19,3 +19,7 @@ class UserRegisterForm(FlaskForm):
         validators.EqualTo("confirm", message="パスワードが一致しません")
     ])
     confirm = PasswordField("Repeat Password")
+
+class DeviceRegisterForm(FlaskForm):
+    device_name = StringField('device name', [validators.length(min=3, max=Util.MaxUsernameLength)])
+    sensor_type = SelectField('SensorType', coerce=int, validators=[validators.Optional()], default='')

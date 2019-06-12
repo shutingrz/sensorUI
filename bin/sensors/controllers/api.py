@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
-from sensors.model.sensors import SensorsModel
+from sensors.model.sensor import SensorModel
 from sensors.model.user import UserModel
 from sensors.model.account import AccountModel
 from sensors.model.device import DeviceModel
