@@ -23,8 +23,9 @@
     {% else %}
     <div class="uk-navbar-item">
       
-        <button class="uk-button uk-button-default">ログイン</button>
-        <button class="uk-button uk-button-default">登録</button>
+        <a class="uk-button uk-button-default" href="{{ url_for('webui.login') }}">ログイン</a>
+        <a class="uk-button uk-button-default" href="{{ url_for('webui.user_register') }}">登録</a>
+      
     </div>
     {% endif %}
   

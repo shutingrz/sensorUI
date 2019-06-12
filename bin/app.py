@@ -4,11 +4,15 @@ from flask import Flask, Blueprint
 from sensors.controllers.api import api as sensors_api
 from sensors.controllers.webui import webui
 from sensors.util import Util
+from flask_wtf.csrf import CSRFProtect
 
 
 def create_app(DBURL=None):
 
     app = Flask(__name__)
+
+    csrf = CSRFProtect(app)
+    csrf.init_app(app)
 
     try:
         app.config.from_pyfile('./sensors.conf')
@@ -31,13 +35,10 @@ def create_app(DBURL=None):
 
     app.config["SECRET_KEY"] = Util.generateRandomBytes(32)
     app.config['JSON_AS_ASCII'] = False
-    app.config['WTF_CSRF_ENABLED'] = False
 
     Util.MaxUsernameLength = app.config["MAX_USERID_LENGTH"]
     Util.MaxUserPassLength = app.config["MAX_USERPASS_LENGTH"]
-    Util.DefaultStockValue = app.config["DEFAULT_STOCK_VALUE"]
     Util.DebugMode = app.config["DEBUG_MODE"]
-    Util.InfiniteMode = app.config["INFINITE_MODE"]
 
     app.register_blueprint(sensors_api)
     app.register_blueprint(webui)
@@ -48,4 +49,7 @@ def create_app(DBURL=None):
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True, host=app.config['LISTEN'], port=app.config['PORT'])
+    app.run(debug=app.config["DEBUG_MODE"], 
+            host=app.config['LISTEN'], 
+            port=app.config['PORT']
+        )

@@ -28,6 +28,10 @@ def load_user(user_hash):
     else:
         return FlaskUser(user_hash, username)
 
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    return redirect("/login?next=" + request.path)
+
 
 @webui.record_once
 def on_load(state):
@@ -44,7 +48,10 @@ def login():
     model = UserModel()
     form = forms.LoginForm(request.form)
 
-    if request.method == 'POST':
+    if request.method == "GET":
+        return render_template('webui/login.html', form=form)
+
+    if request.method == "POST":
         if form.validate():
             user, code = model.user_login(
                 form.username.data, form.password.data)
@@ -53,9 +60,14 @@ def login():
                 login_user(user)
                 return redirect(url_for(".index"))
             else:
-                return render_template('webui/login.html', description="ユーザIDまたはパスワードが違います。", form=form)
+                return render_template('webui/login.html',
+                login_description="ユーザIDまたはパスワードが違います。",
+                form=form)
         else:
-            return render_template('webui/login.html', description="フォームを正しく入力してください。", form=form)
+            return render_template('webui/login.html',
+            login_description="フォームを正しく入力してください。",
+            form=form)
+
     return render_template('webui/login.html', form=form)
 
 
@@ -66,7 +78,39 @@ def logout():
     return redirect(url_for(".index"))
 
 
-@webui.route('/register/user', methods=("GET", "POST"))
+@webui.route('/register', methods=("GET", "POST"))
 def user_register():
+    form = forms.UserRegisterForm(request.form)
 
-    return render_template('webui/user_register.html', form=form)
+    if request.method == "GET":
+        return render_template('webui/user_register.html', form=form)
+
+    if request.method == "POST":
+        if form.validate():
+            username = form.username.data
+            password = form.password.data
+
+            model = UserModel()
+            if model.user_isExist(username)[0]:
+                return render_template('webui/user_register.html',
+                        register_description="既に同じ名前のユーザが存在します。",
+                        form=form)
+
+            msg, code = model.user_register(username, password)
+
+            if code == 0:
+                return render_template('webui/success_user_register.html')
+            else:
+                return render_template('webui/user_register.html',
+                    register_description="ユーザ登録に失敗しました: %s" % msg,
+                    form=form)
+        else:
+            return render_template('webui/user_register.html',
+                register_description="フォームを正しく入力してください。",
+                form=form)
+
+
+@webui.route('/devices')
+@login_required
+def device_list():
+    pass
