@@ -3,83 +3,83 @@
 {% block content %}
 <!-- respected for https://codepen.io/modifiers/details/bKbjNO -->
 <div class="uk-section uk-section-muted uk-flex uk-flex-middle uk-animation-fade" uk-height-viewport>
-    <div class="uk-width-1-1">
-      <div class="uk-container">
-        <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>
-          <div class="uk-width-1-1@m">
-            <div class="uk-margin uk-width-large uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
-              <ul id="tabs" class="uk-tab uk-flex-center" uk-grid uk-switcher="animation: uk-animation-fade">
-                <li><a href="#">Sign Up</a></li>
-                <li><a href="#">Log In</a></li>
-              </ul>
-              <ul class="uk-switcher uk-margin">
-                <li>
-                  <h3 class="uk-card-title uk-text-center">Sensorsに登録する</h3>
-                  {% if register_description %}
-                  <span class="uk-text-danger">{{ register_description }}</span>
-                  {% endif %}
-                  <form method="POST" action="{{ url_for('webui.user_register') }}">
-                    {{ form.csrf_token }}
-                    <div class="uk-margin">
-                      <div class="uk-inline uk-width-1-1">
-                        <span class="uk-form-icon" uk-icon="icon: user"></span>
-                        <input class="uk-input uk-form-large" name="username" type="text" value="{{ form.username.data }}" placeholder="Set a username" required>
-                      </div>
+  <div class="uk-width-1-1">
+    <div class="uk-container">
+      <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>
+        <div class="uk-width-1-1@m">
+          <div class="uk-margin uk-width-large uk-margin-auto uk-card uk-card-default uk-card-body uk-box-shadow-large">
+            <ul id="tabs" class="uk-tab uk-flex-center" uk-grid uk-switcher="animation: uk-animation-fade">
+              <li><a href="#">Sign Up</a></li>
+              <li><a href="#">Log In</a></li>
+            </ul>
+            <ul class="uk-switcher uk-margin">
+              <li>
+                <h3 class="uk-card-title uk-text-center">Sensorsに登録する</h3>
+                {% if register_description %}
+                <span class="uk-text-danger">{{ register_description }}</span>
+                {% endif %}
+                <form method="POST" action="{{ url_for('webui.user_register') }}">
+                  {{ form.csrf_token }}
+                  <div class="uk-margin">
+                    <div class="uk-inline uk-width-1-1">
+                      <span class="uk-form-icon" uk-icon="icon: user"></span>
+                      <input class="uk-input uk-form-large" name="username" type="text" value="{{ form.username.data }}" placeholder="Set a username" required>
                     </div>
-                    <div class="uk-margin">
-                      <div class="uk-inline uk-width-1-1">
-                        <span class="uk-form-icon" uk-icon="icon: lock"></span>
-                        <input class="uk-input uk-form-large" name="password" type="password" value="{{ form.password.data }}" placeholder="Set a password" required>	
-                      </div>
+                  </div>
+                  <div class="uk-margin">
+                    <div class="uk-inline uk-width-1-1">
+                      <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                      <input class="uk-input uk-form-large" name="password" type="password" value="{{ form.password.data }}" placeholder="Set a password" required>	
                     </div>
-                    <div class="uk-margin">
-                      <div class="uk-inline uk-width-1-1">
-                        <span class="uk-form-icon" uk-icon="icon: check"></span>
-                        <input class="uk-input uk-form-large" name="confirm" type="password" placeholder="Set a confirm password" required>	
-                      </div>
+                  </div>
+                  <div class="uk-margin">
+                    <div class="uk-inline uk-width-1-1">
+                      <span class="uk-form-icon" uk-icon="icon: check"></span>
+                      <input class="uk-input uk-form-large" name="confirm" type="password" placeholder="Set a confirm password" required>	
                     </div>
-                    <div class="uk-margin">
-                      <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" type="submit">Sign up</button>
+                  </div>
+                  <div class="uk-margin">
+                    <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" type="submit">Sign up</button>
+                  </div>
+                  <div class="uk-text-small uk-text-center">
+                    すでにアカウントをお持ちですか？<a href="#" uk-switcher-item="1">ログインする</a>
+                  </div>
+                </form>
+              </li>
+              <li>
+                <h3 class="uk-card-title uk-text-center">Sensorsにログイン</h3>
+                {% if login_description %}
+                <span class="uk-text-danger">{{ login_description }}</span>
+                {% endif %}
+                <form method="POST" action="{{ url_for('webui.login') }}">
+                  {{ form.csrf_token }}
+                  <div class="uk-margin">
+                    <div class="uk-inline uk-width-1-1">
+                      <span class="uk-form-icon" uk-icon="icon: user"></span>
+                      <input class="uk-input uk-form-large" name="username" type="text" value="{{ form.username.data }}" placeholder="username">
                     </div>
-                    <div class="uk-text-small uk-text-center">
-                      すでにアカウントをお持ちですか？<a href="#" uk-switcher-item="1">ログインする</a>
+                  </div>
+                  <div class="uk-margin">
+                    <div class="uk-inline uk-width-1-1">
+                      <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                      <input class="uk-input uk-form-large" name="password" type="password" value="{{ form.username.data }}" placeholder="Password">	
                     </div>
-                  </form>
-                </li>
-                <li>
-                  <h3 class="uk-card-title uk-text-center">Sensorsにログイン</h3>
-                  {% if login_description %}
-                  <span class="uk-text-danger">{{ login_description }}</span>
-                  {% endif %}
-                  <form method="POST" action="{{ url_for('webui.login') }}">
-                    {{ form.csrf_token }}
-                    <div class="uk-margin">
-                      <div class="uk-inline uk-width-1-1">
-                        <span class="uk-form-icon" uk-icon="icon: user"></span>
-                        <input class="uk-input uk-form-large" name="username" type="text" value="{{ form.username.data }}" placeholder="username">
-                      </div>
-                    </div>
-                    <div class="uk-margin">
-                      <div class="uk-inline uk-width-1-1">
-                        <span class="uk-form-icon" uk-icon="icon: lock"></span>
-                        <input class="uk-input uk-form-large" name="password" type="password" value="{{ form.username.data }}" placeholder="Password">	
-                      </div>
-                    </div>
-                    <div class="uk-margin">
-                      <button class="uk-button uk-button-primary uk-button-large uk-width-1-1">Login</button>
-                    </div>
-                    <div class="uk-text-small uk-text-center">
-                      まだ登録していませんか？<a href="#" uk-switcher-item="0">アカウントを作成する</a>
-                    </div>
-                  </form>
-                </li>
-              </ul>
-            </div>
+                  </div>
+                  <div class="uk-margin">
+                    <button class="uk-button uk-button-primary uk-button-large uk-width-1-1">Login</button>
+                  </div>
+                  <div class="uk-text-small uk-text-center">
+                    まだ登録していませんか？<a href="#" uk-switcher-item="0">アカウントを作成する</a>
+                  </div>
+                </form>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 
 {% if request.path == "/login"  %}

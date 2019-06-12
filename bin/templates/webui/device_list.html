@@ -1,0 +1,13 @@
+{% extends "layout/body_layout.html" %}
+
+{% block title %}IoT Devices{% endblock %}
+
+{% block contents %}
+<div class="uk-width-2-1 uk-text-center">
+		<div class="">
+				<a href="{{ url_for('webui.device_register') }}">
+					<button class="uk-button uk-button-primary uk-button-medium"><span uk-icon="plus"></span></button>
+				</a>
+		</div>
+</div>
+{% endblock %}

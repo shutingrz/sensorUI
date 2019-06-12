@@ -58,7 +58,7 @@ def login():
 
             if user:
                 login_user(user)
-                return redirect(url_for(".index"))
+                return redirect(request.args.get('next') or url_for(".device_list"))
             else:
                 return render_template('webui/login.html',
                 login_description="ユーザIDまたはパスワードが違います。",
@@ -113,4 +113,10 @@ def user_register():
 @webui.route('/devices')
 @login_required
 def device_list():
-    pass
+    return render_template('webui/device_list.html')
+
+
+@webui.route('/register-device')
+@login_required
+def device_register():
+    return render_template('webui/device_register.html')

@@ -1,0 +1,12 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom k-background-muted">
+  <div class="uk-grid" data-uk-grid-margin>
+    <div class="uk-width-1-1 uk-text-center uk-margin-small">
+      <h1 class="uk-heading-medium">{{ self.title() }}</h1>
+    </div>
+  </div>
+</div>
+{% block contents %}{% endblock %}
+{% endblock %}
