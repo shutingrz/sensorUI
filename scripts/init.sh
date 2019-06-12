@@ -30,6 +30,6 @@ sqlite="sqlite3 ${option} ${dbfile} "
 
 #create table
 for schema_file in ${SCHEMA_DIR}/*.sql; do
-  echo ${schema_file}
+  #echo ${schema_file}
   ${sqlite} < ${schema_file}
 done
