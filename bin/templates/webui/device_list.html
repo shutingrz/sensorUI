@@ -4,10 +4,31 @@
 
 {% block contents %}
 <div class="uk-width-2-1 uk-text-center">
-		<div class="">
-				<a href="{{ url_for('webui.device_register') }}">
-					<button class="uk-button uk-button-primary uk-button-medium"><span uk-icon="plus"></span></button>
-				</a>
-		</div>
+  <div>
+    <a href="{{ url_for('webui.device_register') }}">
+      <button class="uk-button uk-button-primary uk-button-medium"><span uk-icon="plus"></span></button>
+    </a>
+  </div>
+
+  {% if description %}
+  <div class="uk-margin">
+    {{ description }}
+  </div>
+  {% endif %}
+
+
+  {% if devices %}
+  <div class="uk-child-width-1-3@s uk-child-width-1-4@m uk-margin-medium uk-flex uk-flex-center" uk-grid>
+      {% for device in devices%}
+      <div class="uk-child-width-auto@s">
+        <a href class="uk-display-block uk-card uk-card-body uk-card-small uk-card-default uk-link-toggle uk-background-cover  uk-background-blend-lighten uk-background-primary"  style="background-image: url({{ url_for('static', filename='image/temperature_cover.jpg') }})">
+          <h3 class="uk-card-title"><span class="uk-link-heading">{{ device.device_name }}</span></h3>
+          <p>{{ device.sensor_type_name }}</p>
+        </a>
+      </div>
+      {% endfor %}
+  </div>
+  {% endif %}
+
 </div>
 {% endblock %}
