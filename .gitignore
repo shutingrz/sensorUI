@@ -2,6 +2,7 @@
 Thumbs.db
 .vscode
 
+migrations/
 *.pyc
 *.db
 *.sqlite3
