@@ -8,6 +8,26 @@ class AccountModel(object):
     def __init__(self):
         pass
 
+    def device_get(self, user_hash, device_id):
+        db = ORMUtil.initDB()
+        User = ORMUtil.getUserORM()
+        Device = ORMUtil.getDeviceORM()
+
+        if (db and User and Device) is None:
+            return None, 100
+
+        try:
+            device_result = db.session.query(Device).filter(Device.user_hash == user_hash, Device.device_id == device_id).first()
+        except Exception as exc:
+            current_app.logger.critical("account_status: Unknown error: %s" % exc)
+            return None, 199
+
+        device_dict = { "device_name": device_result.device_name,
+                            "device_id": device_result.device_id,
+                            "sensor_type": device_result.sensor_type,
+                            "api_key": device_result.api_key}
+        return device_dict, 0
+
     # TODO account_statusをdevice_listに名称変更
     def device_list(self, user_hash):
         return self.account_status(user_hash)
@@ -33,7 +53,7 @@ class AccountModel(object):
             device_dict = { "device_name": device.device_name,
                             "device_id": device.device_id,
                             "sensor_type": device.sensor_type,
-                            "api_key": device.api_key,}
+                            "api_key": device.api_key}
             
             devices.append(device_dict)
 

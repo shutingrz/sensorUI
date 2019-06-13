@@ -1,0 +1,28 @@
+{% extends "layout/body_layout.html" %}
+
+{% block title %}{{ device.device_name }}{% endblock %}
+{% block subtitle %}Temperature{% endblock %}
+
+{% block contents %}
+<div class="uk-width-2-1 uk-text-center">
+
+
+  {% if description %}
+  <div class="uk-margin">
+    {{ description }}
+  </div>
+  {% endif %}
+
+
+  {% if sensorData %}
+  <div>
+    sensorData: {{ sensorData }}
+  </div>
+  {% else %}
+  <div>
+    センサーデータはありません
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

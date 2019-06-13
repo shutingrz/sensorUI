@@ -19,6 +19,9 @@ class Util():
         Warning = "warning"
         Danger = "Danger"
 
+    class SensorType():
+        Temperature = 1
+
 
     @classmethod
     def generateNotificationMessage(self, status, message):

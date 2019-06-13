@@ -3,7 +3,6 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from flask_wtf import FlaskForm
 from wtforms import StringField, validators
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
-from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 from sensors.controllers import forms
 from sensors.model.user import UserModel
 from sensors.model.account import AccountModel
@@ -175,4 +174,29 @@ def device_register():
                 description="フォームがあかん",
                 form=form)
 
+
+@webui.route('/device/<device_id>')
+@login_required
+def device_view(device_id):
+    accountModel = AccountModel()
+
+    deviceData, code = accountModel.device_get(current_user.user_hash, device_id)
+
+    if code != 0:
+        return redirect(url_for("webui.device_list"))
     
+    endpoint = None
+
+    if deviceData["sensor_type"] == Util.SensorType.Temperature:
+        endpoint = 'webui/device_temperature_view.html'
+        deviceData["sensor_type_name"] = "Temperature"
+
+        sensorTemperatureModel = SensorTemperatureModel()
+        sensorData, code = sensorTemperatureModel.view(current_user.user_hash, device_id)
+        
+    
+    if endpoint:
+        return render_template(endpoint, sensorData=sensorData, device=deviceData) 
+    else:
+        return redirect(url_for("webui.device_list"))
+
