@@ -2,6 +2,7 @@ import hmac
 import hashlib
 import string
 import secrets
+from enum import Enum
 
 
 class Util():
@@ -11,6 +12,18 @@ class Util():
     DefaultStockValue = 100
     InfiniteMode = True
     DebugMode = True
+
+    class NotificationType():
+        Primary = "primary"
+        Success = "success"
+        Warning = "warning"
+        Danger = "Danger"
+
+
+    @classmethod
+    def generateNotificationMessage(self, status, message):
+        return {"status": status, "message": message, "pos": 'top-center'}
+        
 
     @classmethod
     def generateRandomBytes(self, length, seq=string.digits + string.ascii_lowercase):

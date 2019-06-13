@@ -11,5 +11,13 @@
   <body>
     {% include "layout/nav.html" %}
     {% block content %}{% endblock %}
+    
+    {% if notification  %}
+    <script>
+      UIkit.notification({message: '{{ notification.message }}', status: '{{ notification.status }}'})
+    </script>
+    {% endif %}
   </body>
+
+  
 </html>

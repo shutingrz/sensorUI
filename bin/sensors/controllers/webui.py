@@ -122,7 +122,7 @@ def device_list():
         return render_template('webui/device_list.html', description="デバイスの取得に失敗しました")
     else:
         devices = msg["devices"]
-        
+
         sensorTypes, code = sensorModel.getSensorType()
         if code == 0:
             for device in devices:
