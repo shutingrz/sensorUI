@@ -82,7 +82,7 @@
 </div>
 
 
-{% if request.path == "/login"  %}
+{% if request.path == url_for('webui.login')  %}
 <script>
   UIkit.switcher("#tabs").show(1);
 </script>
