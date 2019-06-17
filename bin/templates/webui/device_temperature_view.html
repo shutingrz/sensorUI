@@ -4,6 +4,7 @@
 {% block subtitle %}Temperature{% endblock %}
 
 {% block contents %}
+<script src="https://www.gstatic.com/charts/loader.js"></script>
 <div class="uk-width-2-1 uk-text-center">
 
 
@@ -14,10 +15,57 @@
   {% endif %}
 
 
+  <div>
+    <div>
+        デバイスデータ
+    </div>
+    <div>
+      <div>名前: {{ device.device_name }}</div>
+      <div>api_key: {{ device.api_key }}</div>
+    </div>
+  </div>
   {% if sensorData %}
   <div>
     sensorData: {{ sensorData }}
   </div>
+  <div id="graph">
+
+  </div>
+  <script>
+      (function() {
+        'use strict';
+  
+          // パッケージのロード
+          google.charts.load('current', {packages: ['line']});
+          // コールバックの登録
+          google.charts.setOnLoadCallback(drawChart);
+  
+          // コールバック関数の実装
+          function drawChart() {
+              // データの準備
+              var data　= new google.visualization.DataTable();
+              data.addColumn('date', 'time');
+              data.addColumn('number', 'temperature');
+              
+              {% for record in sensorData %}
+              data.addRow([new Date({{ record.time }} * 1000), {{ record.value }}])
+              {% endfor %}
+  
+              // オプションの準備
+              var options = {
+                  title: '温度',
+                  width: 500,
+                  height: 300
+              };
+  
+              // 描画用インスタンスの生成および描画メソッドの呼び出し
+              var chart = new google.charts.Line(document.getElementById('graph'));
+              chart.draw(data, google.charts.Line.convertOptions(options));
+          }
+  
+  
+      })();
+    </script>
   {% else %}
   <div>
     センサーデータはありません
