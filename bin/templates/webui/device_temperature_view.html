@@ -5,72 +5,107 @@
 
 {% block contents %}
 <script src="https://www.gstatic.com/charts/loader.js"></script>
-<div class="uk-width-2-1 uk-text-center">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.js"></script>
 
-
+<div class="">
   {% if description %}
-  <div class="uk-margin">
+  <div class="uk-margin uk-text-center">
     {{ description }}
   </div>
   {% endif %}
-
-
-  <div>
-    <div>
-        デバイスデータ
-    </div>
-    <div>
-      <div>名前: {{ device.device_name }}</div>
-      <div>api_key: {{ device.api_key }}</div>
-    </div>
+  <div id="graphView" align='center' class="uk-margin-medium">
+    <div id="graph" class=""></div>
   </div>
+  <div id="controlArea">
+      <ul class="accordion-normal" uk-accordion>
+          <li class="uk-open">
+              <a class="uk-accordion-title accordion-normal-link" href="#">デバイス情報</a>
+              <div class="uk-accordion-content">
+                  <p>名前: {{ device.device_name }}</p>
+                  <p>api_key: {{ device.api_key }}</p>
+              </div>
+          </li>
+      </ul>
+
+  </div>
+  
+  
   {% if sensorData %}
+  {# debug display #} 
   <div>
     sensorData: {{ sensorData }}
   </div>
-  <div id="graph">
-
-  </div>
-  <script>
-      (function() {
-        'use strict';
-  
-          // パッケージのロード
-          google.charts.load('current', {packages: ['line']});
-          // コールバックの登録
-          google.charts.setOnLoadCallback(drawChart);
-  
-          // コールバック関数の実装
-          function drawChart() {
-              // データの準備
-              var data　= new google.visualization.DataTable();
-              data.addColumn('date', 'time');
-              data.addColumn('number', 'temperature');
-              
-              {% for record in sensorData %}
-              data.addRow([new Date({{ record.time }} * 1000), {{ record.value }}])
-              {% endfor %}
-  
-              // オプションの準備
-              var options = {
-                  title: '温度',
-                  width: 500,
-                  height: 300
-              };
-  
-              // 描画用インスタンスの生成および描画メソッドの呼び出し
-              var chart = new google.charts.Line(document.getElementById('graph'));
-              chart.draw(data, google.charts.Line.convertOptions(options));
-          }
-  
-  
-      })();
-    </script>
-  {% else %}
-  <div>
-    センサーデータはありません
-  </div>
   {% endif %}
-
+  
 </div>
+
+
+  {% if sensorData %}
+  <script>
+  
+    (function() {
+      'use strict';
+
+      // パッケージのロード
+      google.charts.load('current', {packages: ['line']});
+      // コールバックの登録
+      google.charts.setOnLoadCallback(drawChart);
+
+      // コールバック関数の実装
+      function drawChart() {
+          // データの準備
+          var data　= new google.visualization.DataTable();
+          data.addColumn('date', '時刻');
+          data.addColumn('number', '温度');
+
+          {% for record in sensorData %}
+          data.addRow([new Date({{ record.time }} * 1000), {{ record.value }}])
+          {% endfor %}
+
+          var dateRange = data.getColumnRange(0);
+          var oneMinute = (1000 * 60);
+          var ticksAxisH = [];
+          for (var i = dateRange.min.getTime(); i <= dateRange.max.getTime(); i = i + oneMinute) {
+            // add tick every 1 minute
+            if ((((i - dateRange.min.getTime()) / oneMinute)) === 0) {
+              ticksAxisH.push(new Date(i));
+            }
+          }
+
+          var valueRange = data.getColumnRange(1);
+          var valueMargin = 1;
+          var vAxisMinMax = {min: valueRange.min - valueMargin, max: valueRange.max + valueMargin};
+
+          var valueRange = data.getColumnRange(1);
+          var ticksAxisV = {};
+          ticksAxisV["minValue"] = 15;
+          // オプションの準備
+          var options = {
+            width: 500,
+            hAxis: {
+              format: 'H:mm',
+              ticks: ticksAxisH
+            },
+            vAxis: {
+              //viewWindow: vAxisMinMax,
+              gridlines: {count: 1}
+            },
+            interpolateNulls: true
+          };
+
+          // 描画用インスタンスの生成および描画メソッドの呼び出し
+          var chart = new google.charts.Line(document.getElementById('graph'));
+          chart.draw(data, google.charts.Line.convertOptions(options));
+      }
+
+      /*
+      $(window).resize(function(){
+        drawChart ();
+      });
+      */
+
+
+    })();
+  </script>
+  {% endif %}
 {% endblock %}

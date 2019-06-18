@@ -192,8 +192,8 @@ def device_view(device_id):
         deviceData["sensor_type_name"] = "Temperature"
 
         sensorTemperatureModel = SensorTemperatureModel()
-        sensorData, code = sensorTemperatureModel.view(current_user.user_hash, device_id)
-        
+        sensorData, code = sensorTemperatureModel.getDataOfLastTenMinutes(current_user.user_hash, device_id)  
+
     
     if endpoint:
         return render_template(endpoint, sensorData=sensorData, device=deviceData) 

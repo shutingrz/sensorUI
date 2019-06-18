@@ -1,15 +1,14 @@
 {% extends "layout/base.html" %}
 
 {% block content %}
-<div class="uk-padding">
-<div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom k-background-muted">
-  <div class="uk-grid" data-uk-grid-margin>
-    <div class="uk-width-1-1 uk-text-center uk-margin-small">
-      <h1 class="uk-heading-medium">{{ self.title() }}</h1>
-      <p>{% block subtitle %}{% endblock %}</p>
-    </div>
+<div class="uk-padding uk-container uk-container-center uk-margin-top uk-margin-large-bottom k-background-muted">
+  <div class="uk-text-center uk-margin-medium">
+    <h1 class="uk-heading-medium">{{ self.title() }}</h1>
+    <p>{% block subtitle %}{% endblock %}</p>
   </div>
+
+  {% block contents %}{% endblock %}
+
 </div>
-{% block contents %}{% endblock %}
-</div>
+
 {% endblock %}

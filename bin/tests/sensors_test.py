@@ -102,7 +102,7 @@ class TestUserControl(unittest.TestCase):
 
         # access login required page without session
         rv = self.app.get("/api/account/status")
-        self.assertEqual(rv.status_code, 401)
+        self.assertEqual(rv.status_code, 302)
 
         # register
         rv = self.app.get("/api/register/user", query_string=dict(
@@ -221,10 +221,10 @@ class TestAccountControl(unittest.TestCase):
         now = datetime.now()
         basetime = int(now.timestamp())
 
-        for i in range(0, 11):  # prepare 11 records
+        for i in range(0, 101):  # prepare 101 records
             record = {
                 "time": basetime + i*60,
-                "value": str(20+i)
+                "value": str(20)
             }
             test_records.append(record)
 
@@ -267,9 +267,9 @@ class TestAccountControl(unittest.TestCase):
         json_data = rv.get_json()
         self.assertEqual(json_data["header"]["status"], "success")
 
-        # max 10 records check
+        # max 100 records check
         res_records = json_data["response"]
-        self.assertLess(len(res_records), 11)
+        self.assertLess(len(res_records), 101)
 
 
 if __name__ == '__main__':

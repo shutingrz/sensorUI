@@ -1,34 +1,13 @@
-.navbar-login
-{
-    width: 305px;
-    padding: 10px;
-    padding-bottom: 0px;
+.accordion-normal {
+  /*background: #aac0fd;*/
 }
 
-.navbar-login-session
-{
-    padding: 10px;
-    padding-bottom: 0px;
-    padding-top: 0px;
+.accordion-normal .accordion-normal-link {
+  border-bottom: 1px solid #CCC;
 }
 
-.icon-size
-{
-    font-size: 87px;
-}
-
-.ml-auto .dropdown-menu {
-  left: auto !important;
-  right: 0px;
-}
-
-.list-icon-size
-{
-  font-size: 300% !important;
-  text-align: center;
-  padding: 20px;
-}
-
-.details li {
-  list-style: none;
+.uk-accordion-content {
+  margin-top: 0px;
+  padding: 10px;
+ 
 }

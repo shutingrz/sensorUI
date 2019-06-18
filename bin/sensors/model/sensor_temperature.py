@@ -3,6 +3,7 @@ from sqlalchemy import or_, desc
 from flask import current_app
 from sensors.util import Util
 from sensors.model.ormutil import ORMUtil
+from datetime import datetime, timedelta
 
 
 class SensorTemperatureModel(object):
@@ -10,7 +11,7 @@ class SensorTemperatureModel(object):
     def __init__(self):
         pass
 
-    def view(self, user_hash, device_id):
+    def view(self, user_hash, device_id, startTime=0, endTime=int(datetime.now().timestamp())):
         db = ORMUtil.initDB()
         Temperature = ORMUtil.getSensorTemperatureORM()
         Device = ORMUtil.getDeviceORM()
@@ -19,19 +20,21 @@ class SensorTemperatureModel(object):
             return None, 100
 
         try:
-            devicelist = db.session.query(Device.device_id)\
+            device_result = db.session.query(Device.device_id)\
                 .filter(Device.user_hash == user_hash)\
                 .filter(Device.device_id == device_id)\
-                .all()
+                .first()
 
-            if not devicelist:
+            if not device_result:
                 msg = "this device is not yours"
                 return msg, 110
 
             result = db.session.query(Temperature)\
                 .filter(Temperature.device_id == device_id)\
+                .filter(Temperature.time > startTime)\
+                .filter(Temperature.time < endTime)\
                 .order_by(desc(Temperature.time))\
-                .limit(10)\
+                .limit(100)\
                 .all()
 
         except Exception as exc:
@@ -43,6 +46,20 @@ class SensorTemperatureModel(object):
             records.append(record_dict)
 
         return records, 0
+
+    def getDataOfLastTenMinutes(self, user_hash, device_id):
+        now = datetime.now()
+        minusTenMinutes = now - timedelta(minutes=10)
+
+        startTime = int(minusTenMinutes.timestamp())
+        endTime = int(now.timestamp())
+        
+        record, code = self.view(user_hash, device_id, startTime=startTime, endTime=endTime)
+
+        # TODO. ここで1分毎に直したデータを作る
+
+        return record, code
+
 
     def record(self, api_key, time, value):
 
