@@ -5,7 +5,6 @@
 
 {% block contents %}
 <script src="https://www.gstatic.com/charts/loader.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.js"></script>
 
 <div class="">
   {% if description %}
@@ -13,11 +12,18 @@
     {{ description }}
   </div>
   {% endif %}
+
+  {% if sensorData %}
   <div id="graphView" align='center' class="uk-margin-medium">
     <div id="graph" class=""></div>
   </div>
+  {% else %}
+  <div class="uk-text-center">
+    <p>直近10分間のセンサーデータがありません</p>
+  </div>
+  {% endif %}
   <div id="controlArea">
-      <ul class="accordion-normal" uk-accordion>
+      <ul class="accordion-normal" uk-accordion="multiple: true" uk-accordion>
           <li class="uk-open">
               <a class="uk-accordion-title accordion-normal-link" href="#">デバイス情報</a>
               <div class="uk-accordion-content">
@@ -25,87 +31,117 @@
                   <p>api_key: {{ device.api_key }}</p>
               </div>
           </li>
+
+          {% if config["DEBUG"] %}
+          <li>
+            <a class="uk-accordion-title accordion-normal-link" href="#">デバッグ情報</a>
+            <div class="uk-accordion-content">
+                <p>sensorData: {{ sensorData }}</p>
+                <p>テストデータ生成: <button id="sendTestData">Go!</button></p>
+            </div>
+          </li>
+          {% endif %}
+
       </ul>
 
-  </div>
-  
-  
-  {% if sensorData %}
-  {# debug display #} 
-  <div>
-    sensorData: {{ sensorData }}
-  </div>
-  {% endif %}
-  
+  </div>  
 </div>
 
+{# JavaScript #}
 
-  {% if sensorData %}
-  <script>
+{% if sensorData %}
+<script>
   
-    (function() {
-      'use strict';
+  (function() {
+    'use strict';
+    // パッケージのロード
+    google.charts.load('current', {packages: ['line']});
+    // コールバックの登録
+    google.charts.setOnLoadCallback(drawChart);
+    // コールバック関数の実装
+    function drawChart() {
+      // データの準備
+      var data　= new google.visualization.DataTable();
+      data.addColumn('date', '時刻');
+      data.addColumn('number', '温度');
 
-      // パッケージのロード
-      google.charts.load('current', {packages: ['line']});
-      // コールバックの登録
-      google.charts.setOnLoadCallback(drawChart);
+      {% for record in sensorData %}
+      data.addRow([new Date({{ record.time }} * 1000), {{ record.value }}])
+      {% endfor %}
 
-      // コールバック関数の実装
-      function drawChart() {
-          // データの準備
-          var data　= new google.visualization.DataTable();
-          data.addColumn('date', '時刻');
-          data.addColumn('number', '温度');
-
-          {% for record in sensorData %}
-          data.addRow([new Date({{ record.time }} * 1000), {{ record.value }}])
-          {% endfor %}
-
-          var dateRange = data.getColumnRange(0);
-          var oneMinute = (1000 * 60);
-          var ticksAxisH = [];
-          for (var i = dateRange.min.getTime(); i <= dateRange.max.getTime(); i = i + oneMinute) {
-            // add tick every 1 minute
-            if ((((i - dateRange.min.getTime()) / oneMinute)) === 0) {
-              ticksAxisH.push(new Date(i));
-            }
-          }
-
-          var valueRange = data.getColumnRange(1);
-          var valueMargin = 1;
-          var vAxisMinMax = {min: valueRange.min - valueMargin, max: valueRange.max + valueMargin};
-
-          var valueRange = data.getColumnRange(1);
-          var ticksAxisV = {};
-          ticksAxisV["minValue"] = 15;
-          // オプションの準備
-          var options = {
-            width: 500,
-            hAxis: {
-              format: 'H:mm',
-              ticks: ticksAxisH
-            },
-            vAxis: {
-              //viewWindow: vAxisMinMax,
-              gridlines: {count: 1}
-            },
-            interpolateNulls: true
-          };
-
-          // 描画用インスタンスの生成および描画メソッドの呼び出し
-          var chart = new google.charts.Line(document.getElementById('graph'));
-          chart.draw(data, google.charts.Line.convertOptions(options));
+      //横軸データ間隔の定義
+      var dateRange = data.getColumnRange(0);
+      var oneMinute = (1000 * 60);
+      var ticksAxisH = [];
+      for (var i = dateRange.min.getTime(); i <= dateRange.max.getTime(); i = i + oneMinute) {
+        // add tick every 1 minute
+        if ((((i - dateRange.min.getTime()) / oneMinute)) === 0) {
+          ticksAxisH.push(new Date(i));
+        }
       }
 
-      /*
-      $(window).resize(function(){
-        drawChart ();
-      });
-      */
+      // オプションの準備
+      var options = {
+        width: 500,
+        hAxis: {
+          format: 'H:mm',
+          ticks: ticksAxisH
+        },
+        vAxis: {
+          gridlines: {count: 1}
+        },
+        interpolateNulls: true
+      };
+      // 描画用インスタンスの生成および描画メソッドの呼び出し
+      var chart = new google.charts.Line(document.getElementById('graph'));
+      chart.draw(data, google.charts.Line.convertOptions(options));
+    }
+  })();
+</script>
+{% endif %}
 
 
-    })();
-  </script>
-  {% endif %}
+{% if config["DEBUG"] %}
+<script>
+  function recordTemperature(api_key, time, value){
+    $.ajax({
+      url: "{{ url_for('sensors_api.api_record_temperature') }}",
+      data: {
+        "api_key": api_key,
+        "time": time,
+        "value": value
+      },
+      dataType: "json",
+      timespan: 1000
+    })
+    .then(
+      function(data){
+        if(data["header"]["status"] != "success"){
+          console.log(`[テストデータの送信に失敗] api_key: ${api_key}, unixtime: ${unixtime}, value: ${value}`);
+        }
+      },
+      function(){
+        console.log("通信エラー");
+      }
+    );
+  }
+  $("#sendTestData").on("click", function(){
+    var dt = new Date();
+    var api_key = "{{ device.api_key }}";
+
+    var temp_min = 20;
+    var temp_max = 25;
+
+    for (var i = 0; i < 10; i++){
+      dt.setMinutes(dt.getMinutes()-1);
+      var unixtime = Math.floor( dt.getTime() / 1000 );
+      var value = Math.floor( Math.random() * (temp_max + 1 - temp_min) ) + temp_min ;
+      recordTemperature(api_key, unixtime, value);
+    }
+  });
+</script>
+{% endif %}
+
+
+
 {% endblock %}

@@ -54,9 +54,7 @@ class SensorTemperatureModel(object):
         startTime = int(minusTenMinutes.timestamp())
         endTime = int(now.timestamp())
         
-        record, code = self.view(user_hash, device_id, startTime=startTime, endTime=endTime)
-
-        # TODO. ここで1分毎に直したデータを作る
+        record, code = self.view(user_hash, device_id, startTime=startTime, endTime=endTime)    
 
         return record, code
 
