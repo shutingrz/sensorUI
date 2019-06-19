@@ -153,7 +153,7 @@ def api_account_status():
         return jsonify(_makeResponseMessage(msg))
 
 
-@api.route('/register/device')
+@api.route('/register-device')
 @login_required
 def api_device_register():
 
@@ -174,6 +174,42 @@ def api_device_register():
         return jsonify(_makeErrorMessage(code))
     else:
         return jsonify(_makeResponseMessage(msg))
+
+
+@api.route('/delete-device')
+@login_required
+def api_device_delete():
+    
+    device_id = request.args.get('device_id', None)
+
+    if device_id is None:
+        return jsonify(_makeErrorMessage(11))
+
+    accountModel = AccountModel()
+    deviceData, code = accountModel.device_get(current_user.user_hash, device_id)
+    
+    if deviceData is None or code != 0:
+        return jsonify(_makeErrorMessage(code, msg))
+    
+    sensorType = deviceData["sensor_type"]
+
+    # センタータイプに応じて記録データを削除
+    if sensorType == Util.SensorType.Temperature:
+        sensorTemperatureModel = SensorTemperatureModel()
+        msg, code = sensorTemperatureModel.deleteAll(current_user.user_hash, device_id)
+
+    if msg is None or code != 0:
+        return jsonify(_makeErrorMessage(code, msg))
+
+
+    # デバイス情報を削除
+    msg, code = accountModel.device_delete(current_user.user_hash, device_id)
+
+    if msg is None:
+        return jsonify(_makeErrorMessage(code))
+    else:
+        return jsonify(_makeResponseMessage(msg))
+        
 
 
 @api.route('/device/temperature/<device_id>')
@@ -203,6 +239,25 @@ def api_record_temperature():
     model = SensorTemperatureModel()
 
     msg, code = model.record(api_key, time, value)
+
+    if msg is None or code != 0:
+        return jsonify(_makeErrorMessage(code, msg))
+    else:
+        return jsonify(_makeResponseMessage(msg))
+
+
+@api.route('/delete-record/temperature/all')
+@login_required
+def api_delete_record_temperature_all():
+
+    device_id = request.args.get('device_id', None)
+
+    if device_id is None:
+        return jsonify(_makeErrorMessage(11))
+    
+    model = SensorTemperatureModel()
+
+    msg, code = model.deleteAll(current_user.user_hash, device_id)
 
     if msg is None or code != 0:
         return jsonify(_makeErrorMessage(code, msg))

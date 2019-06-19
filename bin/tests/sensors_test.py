@@ -163,7 +163,7 @@ class TestAccountControl(unittest.TestCase):
     def test_device_register(self):
         testdevice = {"device_name": "testdev", "sensor_type": "1"}
 
-        rv = self.app.get("/api/register/device",
+        rv = self.app.get("/api/register-device",
                           headers={"Cookie": self.session}, query_string=dict(
                               device_name=testdevice["device_name"],
                               sensor_type=testdevice["sensor_type"]
@@ -188,7 +188,7 @@ class TestAccountControl(unittest.TestCase):
         testdevice = {"device_name": "testdev2", "sensor_type": "1"}
 
         # device register
-        rv = self.app.get("/api/register/device",
+        rv = self.app.get("/api/register-device",
                           headers={"Cookie": self.session}, query_string=dict(
                               device_name=testdevice["device_name"],
                               sensor_type=testdevice["sensor_type"]
@@ -211,6 +211,7 @@ class TestAccountControl(unittest.TestCase):
         json_data = rv.get_json()
         self.assertEqual(json_data["header"]["status"], "success")
 
+
     def test_temperature_record(self):
         from datetime import datetime
 
@@ -223,13 +224,13 @@ class TestAccountControl(unittest.TestCase):
 
         for i in range(0, 101):  # prepare 101 records
             record = {
-                "time": basetime + i*60,
+                "time": basetime - i*60,
                 "value": str(20)
             }
             test_records.append(record)
 
         # device register
-        rv = self.app.get("/api/register/device",
+        rv = self.app.get("/api/register-device",
                           headers={"Cookie": self.session}, query_string=dict(
                               device_name=testdevice["device_name"],
                               sensor_type=testdevice["sensor_type"]
@@ -270,6 +271,157 @@ class TestAccountControl(unittest.TestCase):
         # max 100 records check
         res_records = json_data["response"]
         self.assertLess(len(res_records), 101)
+
+
+    def test_temperature_record_delete(self):
+        from datetime import datetime
+
+        testdevice = {"device_name": "testdev4", "sensor_type": "1"}
+
+        # create testdata
+        test_records = []
+        now = datetime.now()
+        basetime = int(now.timestamp())
+
+        for i in range(0, 10):  # prepare 10 records
+            record = {
+                "time": basetime - i*60,
+                "value": str(20)
+            }
+            test_records.append(record)
+
+        # device register
+        rv = self.app.get("/api/register-device",
+                          headers={"Cookie": self.session}, query_string=dict(
+                              device_name=testdevice["device_name"],
+                              sensor_type=testdevice["sensor_type"]
+                          ))
+
+        self.assertEqual(rv.status_code, 200)
+
+        json_data = rv.get_json()
+        self.assertEqual(json_data["header"]["status"], "success")
+
+        api_key = json_data["response"]["api_key"]
+        device_id = json_data["response"]["device_id"]
+        self.assertIsNotNone(api_key)
+        self.assertIsNotNone(device_id)
+
+        # temperature record
+        for record in test_records:
+
+            rv = self.app.get("/api/record/temperature", query_string=dict(
+                api_key=api_key,
+                time=record["time"],
+                value=record["value"]
+            ))
+
+            self.assertEqual(rv.status_code, 200)
+            json_data = rv.get_json()
+            self.assertEqual(json_data["header"]["status"], "success")
+
+        # device view
+        rv = self.app.get("/api/device/temperature/%s" % device_id,
+                          headers={"Cookie": self.session})
+
+        self.assertEqual(rv.status_code, 200)
+
+        json_data = rv.get_json()
+        self.assertEqual(json_data["header"]["status"], "success")
+        # record exist check
+        res_records = json_data["response"]
+        
+        self.assertGreater(len(res_records), 0)
+
+
+        # record delete
+        rv = self.app.get("/api/delete-record/temperature/all", 
+            query_string=dict(
+                device_id = device_id
+            ),
+            headers={"Cookie": self.session}
+        )
+
+        self.assertEqual(rv.status_code, 200)
+
+        json_data = rv.get_json()
+        self.assertEqual(json_data["header"]["status"], "success")
+
+        # record exist check
+        # device view
+        rv = self.app.get("/api/device/temperature/%s" % device_id,
+                          headers={"Cookie": self.session})
+
+        self.assertEqual(rv.status_code, 200)
+
+        json_data = rv.get_json()
+        self.assertEqual(json_data["header"]["status"], "success")
+        # record exist check
+        res_records = json_data["response"]
+        
+        self.assertEqual(len(res_records), 0)
+
+    def test_device_delete(self):
+        testdevice = {"device_name": "testdev5", "sensor_type": "1"}
+
+        rv = self.app.get("/api/register-device",
+                          headers={"Cookie": self.session}, query_string=dict(
+                              device_name=testdevice["device_name"],
+                              sensor_type=testdevice["sensor_type"]
+                          ))
+
+        self.assertEqual(rv.status_code, 200)
+
+        json_data = rv.get_json()
+
+        self.assertEqual(json_data["header"]["status"], "success")
+        device_id = json_data["response"]["device_id"]
+
+        # get device list
+        rv = self.app.get("/api/account/status",
+                          headers={"Cookie": self.session})
+        self.assertEqual(rv.status_code, 200)
+
+        json_data = rv.get_json()
+        self.assertEqual(json_data["header"]["status"], "success")
+
+        devices = json_data["response"]
+
+        isExist = False
+        for device in devices["devices"]:
+            if device_id in device["device_id"]:
+                isExist = True
+            
+        self.assertTrue(isExist)
+
+        # delete device
+        rv = self.app.get("/api/delete-device",
+            headers={"Cookie": self.session}, query_string=dict(
+                device_id = device_id
+            ))
+        self.assertEqual(rv.status_code, 200)
+
+        json_data = rv.get_json()
+        self.assertEqual(json_data["header"]["status"], "success")
+
+        # get device list
+        rv = self.app.get("/api/account/status",
+                          headers={"Cookie": self.session})
+        self.assertEqual(rv.status_code, 200)
+
+        json_data = rv.get_json()
+        self.assertEqual(json_data["header"]["status"], "success")
+
+        devices = json_data["response"]
+
+        isExist = False
+        for device in devices["devices"]:
+            if device_id in device["device_id"]:
+                isExist = True
+            
+        self.assertFalse(isExist)
+
+
 
 
 if __name__ == '__main__':

@@ -69,15 +69,15 @@ class SensorTemperatureModel(object):
             return None, 100
 
         try:
-            deviceData = db.session.query(Device)\
+            device_result = db.session.query(Device)\
                 .filter(Device.api_key == api_key)\
                 .first()
 
-            if not deviceData:
+            if not device_result:
                 msg = "device data is not found"
                 return msg, 110
 
-            device_id = deviceData.device_id
+            device_id = device_result.device_id
 
             db.session.add(Temperature(
                 device_id=device_id,
@@ -93,3 +93,43 @@ class SensorTemperatureModel(object):
 
         msg = "ok"
         return msg, 0
+
+
+    def deleteAll(self, user_hash, device_id):
+        
+        db = ORMUtil.initDB()
+        Temperature = ORMUtil.getSensorTemperatureORM()
+        Device = ORMUtil.getDeviceORM()
+
+        if (db and Temperature and Device) is None:
+            return None, 100
+        
+        try:
+            #デバイス登録情報のチェック
+            device_result = db.session.query(Device)\
+                .filter(Device.user_hash == user_hash)\
+                .filter(Device.device_id == device_id)\
+                .first()
+            
+            if not device_result:
+                msg = "device data is not found"
+                return msg, 110
+
+            # デバイスに紐づく記録データの削除
+            db.session.query(Temperature)\
+                .filter(Temperature.device_id == device_id)\
+                .delete()
+            
+            db.session.commit()
+            
+        except sqlalchemy.exc.IntegrityError as exc:
+            current_app.logger.critical("SQL Integrity error: %s" % exc)
+            return None, 110
+        except Exception as exc:
+            current_app.logger.critical("Unknown error: %s" % exc)
+            return None, 199
+
+        msg = "ok"
+        return msg, 0
+
+

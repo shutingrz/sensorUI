@@ -1,6 +1,7 @@
 from flask import current_app
 from sensors.util import Util
 from sensors.model.ormutil import ORMUtil
+from sensors.util import Util
 import sqlalchemy
 
 class AccountModel(object):
@@ -104,6 +105,45 @@ class AccountModel(object):
                         "api_key": api_key}
 
         return device_dict, 0
+
+
+    def device_delete(self, user_hash, device_id):
+        db = ORMUtil.initDB()
+        Device = ORMUtil.getDeviceORM()
+        SensorType = ORMUtil.getSensorTypeORM()
+
+        if (db and Device and SensorType) is None:
+            return None, 100
+
+        try:
+            # 指定されたデバイスの情報を取得
+            device_result = db.session.query(Device)\
+                        .filter(Device.user_hash == user_hash)\
+                        .filter(Device.device_id == device_id)\
+                        .first()
+
+            if not device_result:
+                return None, 99
+
+            # デバイスに紐づく記録データを削除
+            db.session.query(Device)\
+                .filter(Device.device_id == device_id)\
+                .delete()
+            
+            db.session.commit()
+
+        except sqlalchemy.exc.IntegrityError as exc:
+            current_app.logger.critical("SQL Integrity error: %s" % exc)
+            return None, 110
+        except Exception as exc:
+            current_app.logger.critical("Unknown error: %s" % exc)
+            return None, 199
+        
+        msg = "ok"
+        return msg, 0
+
+
+
 
 
 
