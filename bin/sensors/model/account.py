@@ -116,7 +116,7 @@ class AccountModel(object):
             return None, 100
 
         try:
-            # 指定されたデバイスの情報を取得
+            # 指定されたデバイスが存在するかチェック
             device_result = db.session.query(Device)\
                         .filter(Device.user_hash == user_hash)\
                         .filter(Device.device_id == device_id)\
@@ -125,7 +125,7 @@ class AccountModel(object):
             if not device_result:
                 return None, 99
 
-            # デバイスに紐づく記録データを削除
+            # デバイス情報を削除
             db.session.query(Device)\
                 .filter(Device.device_id == device_id)\
                 .delete()
