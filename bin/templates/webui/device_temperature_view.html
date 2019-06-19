@@ -69,32 +69,23 @@
       data.addRow([new Date({{ record.time }} * 1000), {{ record.value }}])
       {% endfor %}
 
-      //横軸データ間隔の定義
-      var dateRange = data.getColumnRange(0);
-      var oneMinute = (1000 * 60);
-      var ticksAxisH = [];
-      for (var i = dateRange.min.getTime(); i <= dateRange.max.getTime(); i = i + oneMinute) {
-        // add tick every 1 minute
-        if ((((i - dateRange.min.getTime()) / oneMinute)) === 0) {
-          ticksAxisH.push(new Date(i));
-        }
-      }
-
       // オプションの準備
       var options = {
         width: 500,
         hAxis: {
           format: 'H:mm',
-          ticks: ticksAxisH
-        },
-        vAxis: {
-          gridlines: {count: 1}
         },
         interpolateNulls: true
       };
       // 描画用インスタンスの生成および描画メソッドの呼び出し
       var chart = new google.charts.Line(document.getElementById('graph'));
       chart.draw(data, google.charts.Line.convertOptions(options));
+
+      google.visualization.events.addListener(chart, 'ready', readyHandler);
+
+      function readyHandler(e) {
+        chart.setSelection([{"column":1}]);
+      }
     }
   })();
 </script>
