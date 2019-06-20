@@ -5,7 +5,9 @@ from sensors.controllers.api import api as sensors_api
 from sensors.controllers.webui import webui
 from sensors.util import Util
 from flask_wtf.csrf import CSRFProtect
-
+from sensors.db import init_db
+from sensors import db
+from flask_sqlalchemy import SQLAlchemy
 
 def create_app(DBURL=None):
 
@@ -47,6 +49,12 @@ def create_app(DBURL=None):
 
 
 app = create_app()
+init_db(app)
+
+# Migrate対応だが一旦 db.create_all() をする運用とする
+with app.app_context():
+	db.create_all()
+
 
 if __name__ == '__main__':
     app.run(debug=app.config["DEBUG_MODE"], 

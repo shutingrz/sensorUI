@@ -1,5 +1,5 @@
-from sensors.model.ormutil import ORMUtil
 
+# flask-login 用クラス
 
 class User(object):
     def __init__(self, user_hash, username=None):

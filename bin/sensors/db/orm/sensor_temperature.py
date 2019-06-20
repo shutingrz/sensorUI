@@ -11,13 +11,7 @@ class SensorTemperature(db.Model):
     temperature = db.Column(db.Integer, nullable=True)
     created = db.Column(db.DATETIME, default=datetime.now, nullable=False)
 
-    device = db.relationship("Device")
-
     def __init__(self, device_id, time, temperature):
         self.device_id = device_id
         self.time = time
         self.temperature = temperature
-
-
-db.mapper(SensorTemperature, db.Table(
-    'sensor_temperature', db.metadata, autoload=True))

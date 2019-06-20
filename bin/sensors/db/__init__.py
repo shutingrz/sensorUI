@@ -1,16 +1,29 @@
+
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DECIMAL, DATETIME, ForeignKey
-from sqlalchemy.orm import scoped_session, mapper, relationship, backref
-from sqlalchemy.orm.session import sessionmaker
-from flask import Flask, current_app
-from datetime import datetime
-
-database_uri = current_app.config['SQLALCHEMY_DATABASE_URI']
-engine = create_engine(database_uri)
-
-metadata = MetaData(bind=engine)
-session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
-
-class Model(object):
-	query = session.query_property()
+from sqlalchemy.orm import relationship, backref
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 
+db = SQLAlchemy()
+session = db.session
+metadata = db.metadata
+Model = db.Model
+
+
+def init_db(app):
+	db.init_app(app)
+	Migrate(app, db)
+
+
+def create_all():
+	db.create_all()
+
+	from sensors.db.orm.sensor_type import SensorType
+	if db.session.query(SensorType).count() == 0:
+			db.session.add(SensorType(
+                sensor_id=1,
+				sensor_name="Temperature"
+			))
+            
+			db.session.commit()

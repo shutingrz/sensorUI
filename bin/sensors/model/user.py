@@ -1,8 +1,11 @@
 from flask import current_app
+import sqlalchemy
+from sensors import db
 from sensors.util import Util
 from sensors.model.flask_user import User as FlaskUser
-from sensors.model.ormutil import ORMUtil
-import sqlalchemy
+from sensors.db.orm.authentication import Authentication
+from sensors.db.orm.user import User
+
 
 
 class UserModel(object):
@@ -11,41 +14,32 @@ class UserModel(object):
         pass
 
     def user_isExist(self, username):
-        db = ORMUtil.initDB()
-        User = ORMUtil.getUserORM()
-
-        if (db and User) is None:
-            return None, 100
 
         try:
             user = db.session.query(User.username).filter(
-                User.username == username).first()
+                User.username == username).first()        
         except Exception as exc:
             current_app.logger.critical(
                 "user_isExist: Unknown error: %s" % exc)
             return None, 199
 
+        #if user is None:
         if user is None:
             return False, 0
-        else:
+        else:   
             return True, 0
 
-    def user_register(self, username, password):
-        db = ORMUtil.initDB()
-        Authentication = ORMUtil.getAuthenticationORM()
-        User = ORMUtil.getUserORM()
 
-        if (db and Authentication and User) is None:
-            return None, 100
+    def user_register(self, username, password):
 
         hmac_key = Util.generateRandomBytes(32)
         encrypted_password = Util.getEncryptedPassword(hmac_key, password)
         user_hash = Util.generateUserHash(username)
 
         try:
-            db.session.add(Authentication(
-                user_hash, encrypted_password, hmac_key))
             db.session.add(User(username, user_hash, email=None))
+            db.session.add(Authentication(
+                user_hash, encrypted_password, hmac_key))    
             db.session.commit()
         except sqlalchemy.exc.IntegrityError as exc:
             current_app.logger.critical(
@@ -59,12 +53,6 @@ class UserModel(object):
         return "ok", 0
 
     def user_delete(self, username):
-        db = ORMUtil.initDB()
-        Authentication = ORMUtil.getAuthenticationORM()
-        User = ORMUtil.getUserORM()
-
-        if (db and Authentication and User) is None:
-            return None, 100
 
         try:
             user_hash = db.session.query(User.user_hash).filter(
@@ -81,12 +69,6 @@ class UserModel(object):
         return "ok", 0
 
     def user_login(self, username, password):
-        db = ORMUtil.initDB()
-        Authentication = ORMUtil.getAuthenticationORM()
-        User = ORMUtil.getUserORM()
-
-        if (db and Authentication and User) is None:
-            return None, 100
 
         try:
             user_hash = db.session.query(User.user_hash).filter(
@@ -112,11 +94,6 @@ class UserModel(object):
             return None, 123
 
     def getUsername(self, user_hash):
-        db = ORMUtil.initDB()
-        User = ORMUtil.getUserORM()
-
-        if (db and User) is None:
-            return None
 
         try:
             username = db.session.query(User.username).filter(
@@ -128,11 +105,6 @@ class UserModel(object):
         return username
 
     def user_list(self, page=None):
-        db = ORMUtil.initDB()
-        User = ORMUtil.getUserORM()
-
-        if (db and User) is None:
-            return None, 100
 
         try:
             result = db.session.query(User).all()

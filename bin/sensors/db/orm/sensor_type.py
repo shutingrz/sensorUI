@@ -1,6 +1,5 @@
 from sensors import db
 
-
 class SensorType(db.Model):
 
     __tablename__ = "sensor_type"
@@ -11,5 +10,3 @@ class SensorType(db.Model):
         self.sensor_id = sensor_id
         self.sensor_name = sensor_name
 
-
-db.mapper(SensorType, db.Table('sensor_type', db.metadata, autoload=True))

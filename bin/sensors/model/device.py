@@ -1,8 +1,14 @@
 from flask import current_app
-from sensors.util import Util
-from sensors.model.ormutil import ORMUtil
-from sensors.util import Util
 import sqlalchemy
+
+from sensors.util import Util
+
+from sensors import db
+from sensors.db.orm.authentication import Authentication
+from sensors.db.orm.user import User
+from sensors.db.orm.device import Device
+from sensors.db.orm.sensor_type import SensorType
+
 
 class DeviceModel(object):
 
@@ -10,12 +16,6 @@ class DeviceModel(object):
         pass
 
     def device_get(self, user_hash, device_id):
-        db = ORMUtil.initDB()
-        User = ORMUtil.getUserORM()
-        Device = ORMUtil.getDeviceORM()
-
-        if (db and User and Device) is None:
-            return None, 100
 
         try:
             device_result = db.session.query(Device).filter(Device.user_hash == user_hash, Device.device_id == device_id).first()
@@ -23,7 +23,7 @@ class DeviceModel(object):
             if not device_result:
                 return "device not found", 110
         except Exception as exc:
-            current_app.logger.critical("account_status: Unknown error: %s" % exc)
+            current_app.logger.critical("device_get: Unknown error: %s" % exc)
             return None, 199
 
         device_dict = { "device_name": device_result.device_name,
@@ -32,19 +32,13 @@ class DeviceModel(object):
                             "api_key": device_result.api_key}
         return device_dict, 0
 
+
     def device_list(self, user_hash):
-        db = ORMUtil.initDB()
-        User = ORMUtil.getUserORM()
-        Device = ORMUtil.getDeviceORM()
-
-
-        if (db and User and Device) is None:
-            return None, 100
 
         try:
             device_result = db.session.query(Device).filter(Device.user_hash == user_hash).all()
         except Exception as exc:
-            current_app.logger.critical("account_status: Unknown error: %s" % exc)
+            current_app.logger.critical("device_list: Unknown error: %s" % exc)
             return None, 199
 
         devices = []
@@ -62,13 +56,8 @@ class DeviceModel(object):
 
         return msg, 0
 
-    def device_register(self, user_hash, device_name, sensor_type):
-        db = ORMUtil.initDB()
-        Device = ORMUtil.getDeviceORM()
-        SensorType = ORMUtil.getSensorTypeORM()
 
-        if (db and Device and SensorType) is None:
-            return None, 100
+    def device_register(self, user_hash, device_name, sensor_type):
 
         device_id = Util.generateRandomString(32)
         api_key = Util.generateRandomString(32)
@@ -107,12 +96,6 @@ class DeviceModel(object):
 
 
     def device_delete(self, user_hash, device_id):
-        db = ORMUtil.initDB()
-        Device = ORMUtil.getDeviceORM()
-        SensorType = ORMUtil.getSensorTypeORM()
-
-        if (db and Device and SensorType) is None:
-            return None, 100
 
         try:
             # 指定されたデバイスが存在するかチェック

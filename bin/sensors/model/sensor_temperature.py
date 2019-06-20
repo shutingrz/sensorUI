@@ -2,9 +2,11 @@ import sqlalchemy
 from sqlalchemy import or_, desc
 from flask import current_app
 from sensors.util import Util
-from sensors.model.ormutil import ORMUtil
 from datetime import datetime, timedelta
 
+from sensors import db
+from sensors.db.orm.device import Device
+from sensors.db.orm.sensor_temperature import SensorTemperature
 
 class SensorTemperatureModel(object):
 
@@ -12,12 +14,6 @@ class SensorTemperatureModel(object):
         pass
 
     def view(self, user_hash, device_id, startTime=0, endTime=int(datetime.now().timestamp())):
-        db = ORMUtil.initDB()
-        Temperature = ORMUtil.getSensorTemperatureORM()
-        Device = ORMUtil.getDeviceORM()
-
-        if (db and Temperature and Device) is None:
-            return None, 100
 
         try:
             device_result = db.session.query(Device.device_id)\
@@ -29,11 +25,11 @@ class SensorTemperatureModel(object):
                 msg = "this device is not yours"
                 return msg, 110
 
-            result = db.session.query(Temperature)\
-                .filter(Temperature.device_id == device_id)\
-                .filter(Temperature.time > startTime)\
-                .filter(Temperature.time < endTime)\
-                .order_by(desc(Temperature.time))\
+            result = db.session.query(SensorTemperature)\
+                .filter(SensorTemperature.device_id == device_id)\
+                .filter(SensorTemperature.time > startTime)\
+                .filter(SensorTemperature.time < endTime)\
+                .order_by(desc(SensorTemperature.time))\
                 .limit(100)\
                 .all()
 
@@ -61,13 +57,6 @@ class SensorTemperatureModel(object):
 
     def record(self, api_key, time, value):
 
-        db = ORMUtil.initDB()
-        Temperature = ORMUtil.getSensorTemperatureORM()
-        Device = ORMUtil.getDeviceORM()
-
-        if (db and Temperature and Device) is None:
-            return None, 100
-
         try:
             device_result = db.session.query(Device)\
                 .filter(Device.api_key == api_key)\
@@ -79,7 +68,7 @@ class SensorTemperatureModel(object):
 
             device_id = device_result.device_id
 
-            db.session.add(Temperature(
+            db.session.add(SensorTemperature(
                 device_id=device_id,
                 time=time,
                 temperature=value
@@ -96,14 +85,7 @@ class SensorTemperatureModel(object):
 
 
     def deleteAll(self, user_hash, device_id):
-        
-        db = ORMUtil.initDB()
-        Temperature = ORMUtil.getSensorTemperatureORM()
-        Device = ORMUtil.getDeviceORM()
 
-        if (db and Temperature and Device) is None:
-            return None, 100
-        
         try:
             #デバイス登録情報のチェック
             device_result = db.session.query(Device)\
@@ -116,8 +98,8 @@ class SensorTemperatureModel(object):
                 return msg, 110
 
             # デバイスに紐づく記録データの削除
-            db.session.query(Temperature)\
-                .filter(Temperature.device_id == device_id)\
+            db.session.query(SensorTemperature)\
+                .filter(SensorTemperature.device_id == device_id)\
                 .delete()
             
             db.session.commit()

@@ -2,7 +2,9 @@ import sqlalchemy
 from sqlalchemy import or_
 from flask import current_app
 from sensors.util import Util
-from sensors.model.ormutil import ORMUtil
+
+from sensors import db
+from sensors.db.orm.sensor_type import SensorType
 
 
 class SensorModel(object):
@@ -11,16 +13,11 @@ class SensorModel(object):
 		pass
 
 	def getSensorType(self):
-		db = ORMUtil.initDB()
-		SensorType = ORMUtil.getSensorTypeORM()
-
-		if (db and SensorType) is None:
-			return None, 100
 
 		try:
 			sensorType_result = db.session.query(SensorType).all()
 		except Exception as exc:
-			current_app.logger.critical("account_status: Unknown error: %s" % exc)
+			current_app.logger.critical("getSensorType: Unknown error: %s" % exc)
 			return None, 199
 
 		#sensorの対応表取得

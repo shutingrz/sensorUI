@@ -7,16 +7,19 @@ from flask import Flask
 import subprocess
 import app as sensors_app
 import time
+from sensors.db import init_db
+from sensors import db
 
-# ここなんとかしたい・・・
+# データベースの準備
 tempDB = tempfile.mkstemp()
 tempDBPath = tempDB[1]
 dburl = "sqlite:///" + tempDBPath
-result = subprocess.run(
-    ["/bin/bash", "-c", "../scripts/init.sh %s" % tempDBPath])
-time.sleep(1)
 
 app = sensors_app.create_app(dburl)
+init_db(app)
+
+with app.app_context():
+	db.create_all()
 
 
 class TestUserControl(unittest.TestCase):
