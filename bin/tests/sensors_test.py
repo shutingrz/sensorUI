@@ -101,7 +101,7 @@ class TestUserControl(unittest.TestCase):
         testuser = {"name": "test_auth_test", "password": "testtest"}
 
         # access login required page without session
-        rv = self.app.get("/api/account/status")
+        rv = self.app.get("/api/devices")
         self.assertEqual(rv.status_code, 302)
 
         # register
@@ -124,7 +124,7 @@ class TestUserControl(unittest.TestCase):
         self.assertIn("session", session)
 
         # access login required page with session
-        rv = self.app.get("/api/account/status", headers={"Cookie": session})
+        rv = self.app.get("/api/devices", headers={"Cookie": session})
         self.assertEqual(rv.status_code, 200)
 
         json_data = rv.get_json()
@@ -176,7 +176,7 @@ class TestAccountControl(unittest.TestCase):
         self.assertEqual(json_data["header"]["status"], "success")
 
         # get device list
-        rv = self.app.get("/api/account/status",
+        rv = self.app.get("/api/devices",
                           headers={"Cookie": self.session})
         self.assertEqual(rv.status_code, 200)
 
@@ -378,7 +378,7 @@ class TestAccountControl(unittest.TestCase):
         device_id = json_data["response"]["device_id"]
 
         # get device list
-        rv = self.app.get("/api/account/status",
+        rv = self.app.get("/api/devices",
                           headers={"Cookie": self.session})
         self.assertEqual(rv.status_code, 200)
 
@@ -405,7 +405,7 @@ class TestAccountControl(unittest.TestCase):
         self.assertEqual(json_data["header"]["status"], "success")
 
         # get device list
-        rv = self.app.get("/api/account/status",
+        rv = self.app.get("/api/devices",
                           headers={"Cookie": self.session})
         self.assertEqual(rv.status_code, 200)
 

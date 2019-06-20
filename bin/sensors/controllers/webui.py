@@ -5,7 +5,6 @@ from wtforms import StringField, validators
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from sensors.controllers import forms
 from sensors.model.user import UserModel
-from sensors.model.account import AccountModel
 from sensors.model.device import DeviceModel
 from sensors.model.sensor import SensorModel
 from sensors.model.sensor_temperature import SensorTemperatureModel
@@ -112,10 +111,10 @@ def user_register():
 @webui.route('/devices')
 @login_required
 def device_list():
-    accountModel = AccountModel()
+    deviceModel = DeviceModel()
     sensorModel = SensorModel()
 
-    msg, code = accountModel.device_list(current_user.user_hash)
+    msg, code = deviceModel.device_list(current_user.user_hash)
 
     if code != 0:
         return render_template('webui/device_list.html', description="デバイスの取得に失敗しました")
@@ -159,7 +158,7 @@ def device_register():
             device_name = form.device_name.data
             sensor_type = form.sensor_type.data
 
-            model = AccountModel()
+            model = DeviceModel()
 
             msg, code = model.device_register(current_user.user_hash, device_name, sensor_type)
 
@@ -178,9 +177,9 @@ def device_register():
 @webui.route('/device/<device_id>')
 @login_required
 def device_view(device_id):
-    accountModel = AccountModel()
+    deviceModel = DeviceModel()
 
-    deviceData, code = accountModel.device_get(current_user.user_hash, device_id)
+    deviceData, code = deviceModel.device_get(current_user.user_hash, device_id)
 
     if code != 0:
         return redirect(url_for("webui.device_list"))

@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 from sensors.model.sensor import SensorModel
 from sensors.model.user import UserModel
-from sensors.model.account import AccountModel
 from sensors.model.device import DeviceModel
 from sensors.model.sensor_temperature import SensorTemperatureModel
 from sensors.model.flask_user import User as FlaskUser
@@ -141,11 +140,11 @@ def api_userid_isExist(username):
         return jsonify(_makeResponseMessage(msg))
 
 
-@api.route('/account/status')
+@api.route('/devices')
 @login_required
-def api_account_status():
-    model = AccountModel()
-    msg, code = model.account_status(current_user.user_hash)
+def device_list():
+    model = DeviceModel()
+    msg, code = model.device_list(current_user.user_hash)
 
     if msg is None:
         return jsonify(_makeErrorMessage(code))
@@ -166,7 +165,7 @@ def api_device_register():
     if len(device_name) > Util.MaxUsernameLength:
         return jsonify(_makeErrorMessage(12))
 
-    model = AccountModel()
+    model = DeviceModel()
 
     msg, code = model.device_register(current_user.user_hash, device_name, sensor_type)
 
@@ -185,8 +184,8 @@ def api_device_delete():
     if device_id is None:
         return jsonify(_makeErrorMessage(11))
 
-    accountModel = AccountModel()
-    deviceData, code = accountModel.device_get(current_user.user_hash, device_id)
+    deviceModel = DeviceModel()
+    deviceData, code = deviceModel.device_get(current_user.user_hash, device_id)
     
     if deviceData is None or code != 0:
         return jsonify(_makeErrorMessage(code, msg))
@@ -203,7 +202,7 @@ def api_device_delete():
 
 
     # デバイス情報を削除
-    msg, code = accountModel.device_delete(current_user.user_hash, device_id)
+    msg, code = deviceModel.device_delete(current_user.user_hash, device_id)
 
     if msg is None:
         return jsonify(_makeErrorMessage(code))
