@@ -29,6 +29,7 @@
               <div class="uk-accordion-content">
                   <p>名前: {{ device.device_name }}</p>
                   <p>api_key: {{ device.api_key }}</p>
+                  <p><a href="#modal-delete_device" uk-toggle>デバイスを削除</a></p>
               </div>
           </li>
 
@@ -47,7 +48,55 @@
   </div>  
 </div>
 
+{# Modal #}
+<div id="modal-delete_device" uk-modal>
+  <div class="uk-modal-dialog uk-modal-body">
+    <p>記録データは全て削除され、既に設置しているセンサーによる記録リクエストは全て拒否されます。</p>
+    <p>本当に削除しますか？</p>
+    <p id="modal-delete_device_description" class="uk-text-danger"></p>
+    <p class="uk-text-center">
+      <button class="uk-button uk-button-default uk-modal-close" type="button">キャンセル</button>
+      <button class="uk-button uk-button-primary" id="button-delete_device_confirm" type="button">削除</button>
+    </p>
+  </div>
+</div>
+
+
 {# JavaScript #}
+
+<script>
+
+  var desriptionArea = $("#modal-delete_device_description");
+  var delete_Btn = $("#button-delete_device_confirm");
+
+  delete_Btn.on("click", function(){
+    delete_Btn.prop("disabled", true);
+
+    $.ajax({
+      url: "{{ url_for('sensors_api.api_device_delete') }}",
+      data: {
+        "device_id": "{{ device.device_id }}"
+      },
+      dataType: "json",
+      timespan: 1000
+    })
+    .then(
+      function(data){
+        if(data["header"]["status"] == "success"){
+          window.location.href = "{{ url_for('webui.device_list') }}";
+        }else{
+          delete_Btn.prop("disabled", false);
+          desriptionArea.text("削除に失敗しました。またあとで試してください。");
+        }
+      },
+      function(){
+        delete_Btn.prop("disabled", false);
+        desriptionArea.text("削除に失敗しました。またあとで試してください。");
+      }
+    );
+  });
+</script>
+
 
 {% if sensorData %}
 <script>

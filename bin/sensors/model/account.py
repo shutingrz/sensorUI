@@ -19,6 +19,9 @@ class AccountModel(object):
 
         try:
             device_result = db.session.query(Device).filter(Device.user_hash == user_hash, Device.device_id == device_id).first()
+
+            if not device_result:
+                return "device not found", 110
         except Exception as exc:
             current_app.logger.critical("account_status: Unknown error: %s" % exc)
             return None, 199
