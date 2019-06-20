@@ -32,11 +32,7 @@ class DeviceModel(object):
                             "api_key": device_result.api_key}
         return device_dict, 0
 
-    # TODO account_statusをdevice_listに名称変更
     def device_list(self, user_hash):
-        return self.account_status(user_hash)
-        
-    def account_status(self, user_hash):
         db = ORMUtil.initDB()
         User = ORMUtil.getUserORM()
         Device = ORMUtil.getDeviceORM()
