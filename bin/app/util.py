@@ -2,16 +2,17 @@ import hmac
 import hashlib
 import string
 import secrets
-from enum import Enum
+from enum import Enum, IntEnum, auto
+
+class ResultCode(IntEnum):
+    Success = 0
+    DBError = auto()
+    FormatError = auto()
+    ValueError = auto()
+    GenericError = auto()
 
 
 class Util():
-
-    MaxUsernameLength = 64
-    MaxUserPassLength = 64
-    DefaultStockValue = 100
-    InfiniteMode = True
-    DebugMode = True
 
     class NotificationType():
         Primary = "primary"
@@ -19,9 +20,13 @@ class Util():
         Warning = "warning"
         Danger = "Danger"
 
+
     class SensorType():
         Temperature = 1
 
+    MaxUsernameLength = 64
+    MaxUserPassLength = 64
+    DebugMode = True
 
     @classmethod
     def generateNotificationMessage(self, status, message):

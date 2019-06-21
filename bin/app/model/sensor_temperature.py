@@ -1,7 +1,7 @@
 import sqlalchemy
 from sqlalchemy import desc
 from flask import current_app
-from app.util import Util
+from app.util import Util, ResultCode
 from datetime import datetime, timedelta
 
 from app import db
@@ -20,9 +20,9 @@ class SensorTemperatureModel(object):
                 .filter(Device.device_id == device_id)\
                 .first()
 
+            # 指定されたデバイスが存在するか
             if not device_result:
-                msg = "this device is not yours"
-                return msg, 110
+                return None, ResultCode.ValueError
 
             result = db.session.query(SensorTemperature)\
                 .filter(SensorTemperature.device_id == device_id)\
@@ -34,13 +34,14 @@ class SensorTemperatureModel(object):
 
         except Exception as exc:
             current_app.logger.critical("Unknown error: %s" % exc)
+            return None, ResultCode.DBError
 
         records = []
         for record in result:
             record_dict = {"time": record.time, "value": record.temperature}
             records.append(record_dict)
 
-        return records, 0
+        return records, ResultCode.Success
 
     def getDataOfLastTenMinutes(self, user_hash, device_id):
         now = datetime.now()
@@ -62,8 +63,7 @@ class SensorTemperatureModel(object):
                 .first()
 
             if not device_result:
-                msg = "device data is not found"
-                return msg, 110
+                return None, ResultCode.ValueError
 
             device_id = device_result.device_id
 
@@ -77,10 +77,10 @@ class SensorTemperatureModel(object):
 
         except Exception as exc:
             current_app.logger.critical("Unknown error: %s" % exc)
-            return None, 199
+            return None, ResultCode.DBError
 
         msg = "ok"
-        return msg, 0
+        return msg, ResultCode.Success
 
 
     def deleteAll(self, user_hash, device_id):
@@ -93,8 +93,7 @@ class SensorTemperatureModel(object):
                 .first()
             
             if not device_result:
-                msg = "device data is not found"
-                return msg, 110
+                return None, ResultCode.ValueError
 
             # デバイスに紐づく記録データの削除
             db.session.query(SensorTemperature)\
@@ -105,12 +104,13 @@ class SensorTemperatureModel(object):
             
         except sqlalchemy.exc.IntegrityError as exc:
             current_app.logger.critical("SQL Integrity error: %s" % exc)
-            return None, 110
+            return None, ResultCode.FormatError
+            
         except Exception as exc:
             current_app.logger.critical("Unknown error: %s" % exc)
-            return None, 199
+            return None, ResultCode.DBError
 
         msg = "ok"
-        return msg, 0
+        return msg, ResultCode.Success
 
 

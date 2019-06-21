@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from app.controllers import forms
 from app.model import FlaskUser, SensorModel, UserModel, DeviceModel, SensorTemperatureModel
-from app.util import Util
+from app.util import Util, ResultCode
 
 webui = Blueprint('webui', __name__)
 
@@ -50,10 +50,9 @@ def login():
             login_description="フォームを正しく入力してください。",
             form=form)
         
-        user, code = model.user_login(
-            form.username.data, form.password.data)
+        user, code = model.user_login(form.username.data, form.password.data)
 
-        if code == 0 and user:
+        if code == ResultCode.Success and user:
             login_user(user)
             return redirect(request.args.get('next') or url_for("webui.device_list"))
         else:
@@ -97,7 +96,7 @@ def user_register():
 
         msg, code = model.user_register(username, password)
 
-        if code == 0:
+        if code == ResultCode.Success :
             return render_template('webui/success_user_register.html')
         else:
             return render_template('webui/user_register.html',
@@ -140,7 +139,7 @@ def device_register():
     form = forms.DeviceRegisterForm(request.form)
 
     sensorTypes, code = sensorModel.getSensorType()
-    if code != 0:
+    if code != ResultCode.Success:
         return render_template('webui/device_register.html',
             description="センサータイプの取得に失敗しました: %s" % sensorTypes,
             form=form)
@@ -165,7 +164,7 @@ def device_register():
 
         msg, code = model.device_register(current_user.user_hash, device_name, sensor_type)
 
-        if code == 0:
+        if code == ResultCode.Success:
             return redirect(url_for("webui.device_list"))
         else:
             return render_template('webui/device_register.html',
@@ -180,7 +179,7 @@ def device_view(device_id):
 
     deviceData, code = deviceModel.device_get(current_user.user_hash, device_id)
 
-    if code != 0:
+    if code != ResultCode.Success:
         return redirect(url_for("webui.device_list"))
     
     endpoint = None

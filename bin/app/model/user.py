@@ -1,7 +1,7 @@
 from flask import current_app
 import sqlalchemy
 from app import db
-from app.util import Util
+from app.util import Util, ResultCode
 from app.model.flask_user import FlaskUser
 from app.db.orm import Authentication, User
 
@@ -20,12 +20,12 @@ class UserModel(object):
         except Exception as exc:
             current_app.logger.critical(
                 "user_isExist: Unknown error: %s" % exc)
-            return None, 199
+            return None, ResultCode.DBError
 
         if user is None:
-            return False, 0
+            return False, ResultCode.Success
         else:   
-            return True, 0
+            return True, ResultCode.Success
 
 
     def user_register(self, username, password):
@@ -42,13 +42,13 @@ class UserModel(object):
         except sqlalchemy.exc.IntegrityError as exc:
             current_app.logger.critical(
                 "user_register: Integrity error: %s" % exc)
-            return None, 110
+            return None, ResultCode.FormatError
         except Exception as exc:
             current_app.logger.critical(
                 "user_register: Unknown error: %s" % exc)
-            return None, 199
+            return None, ResultCode.DBError
 
-        return "ok", 0
+        return "ok", ResultCode.Success
 
     def user_delete(self, username):
 
@@ -62,40 +62,37 @@ class UserModel(object):
             db.session.commit()
         except Exception as exc:
             current_app.logger.critical("user_delete: Unknown error: %s" % exc)
-            return None, 199
+            return None, ResultCode.DBError
 
-        return "ok", 0
+        return "ok", ResultCode.Success
 
     def user_login(self, username, password):
-
         try:
             user_result = db.session.query(User).filter(
                 User.username == username).first()
 
             if not user_result:
-                return None, 100
+                return None, ResultCode.ValueError
 
             user_hash = user_result.user_hash
 
             result = db.session.query(Authentication.hmac_key, Authentication.encrypted_password).filter(
                 Authentication.user_hash == user_hash).first()
+
         except Exception as exc:
             current_app.logger.critical("user_login: Unknown error: %s" % exc)
-            return None, 122
+            return None, ResultCode.DBError
 
         if result is None:
-            return None, 121
+            return None, ResultCode.ValueError
 
         hmac_key = result.hmac_key
         encrypted_password = Util.getEncryptedPassword(hmac_key, password)
 
         if result.encrypted_password == encrypted_password:
-            try:
-                return FlaskUser(user_hash, username), 0
-            except Exception as exc:
-                return None, 124
+            return FlaskUser(user_hash, username), ResultCode.Success
         else:
-            return None, 123
+            return None, ResultCode.ValueError
 
     def getUsername(self, user_hash):
 
@@ -114,11 +111,11 @@ class UserModel(object):
             result = db.session.query(User).all()
         except Exception as exc:
             current_app.logger.critical("user_list: Unknown error: %s" % exc)
-            return None, 122
+            return None, ResultCode.DBError
 
         users = []
         for user in result:
             user_dict = {"username": user.username}
             users.append(user_dict)
 
-        return users, 0
+        return users, ResultCode.Success

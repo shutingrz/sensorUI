@@ -9,7 +9,7 @@ class SensorTemperature(db.Model):
     device_id = db.Column(db.String(32), db.ForeignKey("device.device_id"), nullable=False)
     time = db.Column(db.Integer, nullable=False)
     temperature = db.Column(db.Integer, nullable=True)
-    created = db.Column(db.DATETIME, default=datetime.now, nullable=False)
+    created = db.Column(db.DATETIME, default=datetime.utcnow, nullable=False)
 
     def __init__(self, device_id, time, temperature):
         self.device_id = device_id

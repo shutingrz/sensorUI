@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 from app.model import FlaskUser, SensorModel, UserModel, DeviceModel, SensorTemperatureModel
-from app.util import Util
+from app.util import Util, ResultCode
 
 api = Blueprint('api', __name__)
 login_manager = LoginManager()
@@ -30,10 +30,10 @@ def api_user_list():
 
     msg, code = model.user_list(page)
 
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
+    if code == ResultCode.Success:
+        return jsonify(_makeResponseMessage(msg)) 
     else:
-        return jsonify(_makeResponseMessage(msg))
+        return jsonify(_makeErrorMessage(code))
 
 @api.route('/login')
 def api_login():
@@ -41,20 +41,20 @@ def api_login():
     password = request.args.get('password', None)
 
     if username is None or password is None:
-        return jsonify(_makeErrorMessage(11))
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
 
     if len(username) > Util.MaxUsernameLength or len(password) > Util.MaxUserPassLength:
-        return jsonify(_makeErrorMessage(12))
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
 
     model = UserModel()
     user, code = model.user_login(username, password)
 
-    if code == 0 and user:
+    if code == ResultCode.Success and user:
         login_user(user)
         msg = "login successful"
         return jsonify(_makeResponseMessage(msg))
     else:
-        return jsonify(_makeErrorMessage(21))
+        return jsonify(_makeErrorMessage(ResultCode.GenericError))
 
 
 @api.route('/logout')
@@ -72,16 +72,16 @@ def api_user_register():
     password = request.args.get('password', None)
 
     if username is None or password is None:
-        return jsonify(_makeErrorMessage(11))
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
 
     if len(username) > Util.MaxUsernameLength or len(password) > Util.MaxUserPassLength:
-        return jsonify(_makeErrorMessage(12))
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
 
     model = UserModel()
 
     # get first element, because user_isExist returns "True/False, code".
     if model.user_isExist(username)[0]:
-        return jsonify(_makeErrorMessage(13))
+        return jsonify(_makeErrorMessage(ResultCode.ValueError))
 
     msg, code = model.user_register(username, password)
 
@@ -100,15 +100,18 @@ def api_admin_user_delete(username):
 
     model = UserModel()
 
-    if model.user_isExist(username)[0]:
-        msg, code = model.user_delete(username)
+    if not model.user_isExist(username)[0]:
+        return jsonify(_makeErrorMessage(ResultCode.ValueError))
 
-        if msg is None:
-            return jsonify(_makeErrorMessage(code))
-        else:
-            return jsonify(_makeResponseMessage(msg))
+
+    msg, code = model.user_delete(username)
+
+    if code == ResultCode.Success:
+        return jsonify(_makeResponseMessage(msg))
     else:
-        return jsonify(_makeErrorMessage(13))
+        return jsonify(_makeErrorMessage(code))
+            
+        
 
 
 '''
@@ -122,10 +125,11 @@ def api_userid_isExist(username):
     model = UserModel()
     msg, code = model.user_isExist(username)
 
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
-    else:
+    if code == ResultCode.Success:
         return jsonify(_makeResponseMessage(msg))
+    else:
+        return jsonify(_makeErrorMessage(code))
+        
 
 
 @api.route('/devices')
@@ -134,10 +138,12 @@ def device_list():
     model = DeviceModel()
     msg, code = model.device_list(current_user.user_hash)
 
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
-    else:
+    
+    if code == ResultCode.Success:
         return jsonify(_makeResponseMessage(msg))
+    else:
+        return jsonify(_makeErrorMessage(code))
+        
 
 
 @api.route('/register-device')
@@ -148,19 +154,20 @@ def api_device_register():
     sensor_type = request.args.get('sensor_type', None)
 
     if device_name is None or sensor_type is None:
-        return jsonify(_makeErrorMessage(11))
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
 
     if len(device_name) > Util.MaxUsernameLength or len(device_name) < 1:
-        return jsonify(_makeErrorMessage(12))
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
 
     model = DeviceModel()
 
     msg, code = model.device_register(current_user.user_hash, device_name, sensor_type)
 
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
-    else:
+    if code == ResultCode.Success:
         return jsonify(_makeResponseMessage(msg))
+    else:
+        return jsonify(_makeErrorMessage(code))
+        
 
 
 @api.route('/delete-device')
@@ -170,32 +177,39 @@ def api_device_delete():
     device_id = request.args.get('device_id', None)
 
     if device_id is None:
-        return jsonify(_makeErrorMessage(11))
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
 
     deviceModel = DeviceModel()
     deviceData, code = deviceModel.device_get(current_user.user_hash, device_id)
     
-    if deviceData is None or code != 0:
+    if deviceData is None or code != ResultCode.Success:
         return jsonify(_makeErrorMessage(code, msg))
     
     sensorType = deviceData["sensor_type"]
 
     # センタータイプに応じて記録データを削除
-    if sensorType == Util.SensorType.Temperature:
-        sensorTemperatureModel = SensorTemperatureModel()
-        msg, code = sensorTemperatureModel.deleteAll(current_user.user_hash, device_id)
+    sensorModel = None
 
-    if msg is None or code != 0:
+    if sensorType == Util.SensorType.Temperature:
+        sensorModel = SensorTemperatureModel()
+    
+    if sensorModel is None:
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
+
+    msg, code = sensorModel.deleteAll(current_user.user_hash, device_id)
+
+    if msg is None or code != ResultCode.Success:
         return jsonify(_makeErrorMessage(code, msg))
 
 
     # デバイス情報を削除
     msg, code = deviceModel.device_delete(current_user.user_hash, device_id)
 
-    if msg is None:
-        return jsonify(_makeErrorMessage(code))
-    else:
+    if code == ResultCode.Success:
         return jsonify(_makeResponseMessage(msg))
+    else:
+        return jsonify(_makeErrorMessage(code))
+        
         
 
 
@@ -207,10 +221,10 @@ def api_device_temperature_view(device_id):
 
     msg, code = model.view(current_user.user_hash, device_id)
 
-    if msg is None or code != 0:
-        return jsonify(_makeErrorMessage(code, msg))
-    else:
+    if code == ResultCode.Success:
         return jsonify(_makeResponseMessage(msg))
+    else:
+        return jsonify(_makeErrorMessage(code, msg))
 
 
 @api.route('/record/temperature')
@@ -221,16 +235,17 @@ def api_record_temperature():
     value = request.args.get("value", None)
 
     if api_key is None or time is None or value is None:
-        return jsonify(_makeErrorMessage(11))
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
     
     model = SensorTemperatureModel()
 
     msg, code = model.record(api_key, time, value)
 
-    if msg is None or code != 0:
-        return jsonify(_makeErrorMessage(code, msg))
-    else:
+    if code == ResultCode.Success:
         return jsonify(_makeResponseMessage(msg))
+    else:
+        return jsonify(_makeErrorMessage(code, msg))
+        
 
 
 @api.route('/delete-record/temperature/all')
@@ -240,16 +255,17 @@ def api_delete_record_temperature_all():
     device_id = request.args.get('device_id', None)
 
     if device_id is None:
-        return jsonify(_makeErrorMessage(11))
+        return jsonify(_makeErrorMessage(ResultCode.FormatError))
     
     model = SensorTemperatureModel()
 
     msg, code = model.deleteAll(current_user.user_hash, device_id)
 
-    if msg is None or code != 0:
-        return jsonify(_makeErrorMessage(code, msg))
-    else:
+    if code == ResultCode.Success:
         return jsonify(_makeResponseMessage(msg))
+    else:
+        return jsonify(_makeErrorMessage(code, msg))
+        
 
 
 def _makeErrorMessage(code, msg = {}):
