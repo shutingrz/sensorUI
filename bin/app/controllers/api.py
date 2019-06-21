@@ -155,7 +155,7 @@ def api_device_register():
     if device_name is None or sensor_type is None:
         return jsonify(_makeErrorMessage(11))
 
-    if len(device_name) > Util.MaxUsernameLength:
+    if len(device_name) > Util.MaxUsernameLength or len(device_name) < 1:
         return jsonify(_makeErrorMessage(12))
 
     model = DeviceModel()

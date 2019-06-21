@@ -21,5 +21,5 @@ class UserRegisterForm(FlaskForm):
     confirm = PasswordField("Repeat Password")
 
 class DeviceRegisterForm(FlaskForm):
-    device_name = StringField('device name', [validators.length(min=3, max=Util.MaxUsernameLength)])
+    device_name = StringField('device name', [validators.length(min=1, max=Util.MaxUsernameLength)])
     sensor_type = SelectField('SensorType', coerce=int, validators=[validators.Optional()], default='')
