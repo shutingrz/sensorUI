@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from flask import Flask, Blueprint
-from sensors.controllers.api import api as sensors_api
+from sensors.controllers.api import api
 from sensors.controllers.webui import webui
 from sensors.util import Util
 from flask_wtf.csrf import CSRFProtect
@@ -42,7 +42,7 @@ def create_app(DBURL=None):
     Util.MaxUserPassLength = app.config["MAX_USERPASS_LENGTH"]
     Util.DebugMode = app.config["DEBUG_MODE"]
 
-    app.register_blueprint(sensors_api)
+    app.register_blueprint(api)
     app.register_blueprint(webui)
 
     return app

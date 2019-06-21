@@ -73,7 +73,7 @@
     delete_Btn.prop("disabled", true);
 
     $.ajax({
-      url: "{{ url_for('sensors_api.api_device_delete') }}",
+      url: "{{ url_for('api.api_device_delete') }}",
       data: {
         "device_id": "{{ device.device_id }}"
       },
@@ -145,7 +145,7 @@
 <script>
   function recordTemperature(api_key, time, value){
     $.ajax({
-      url: "{{ url_for('sensors_api.api_record_temperature') }}",
+      url: "{{ url_for('api.api_record_temperature') }}",
       data: {
         "api_key": api_key,
         "time": time,

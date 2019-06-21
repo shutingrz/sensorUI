@@ -7,7 +7,7 @@ from sensors.model.sensor_temperature import SensorTemperatureModel
 from sensors.model.flask_user import User as FlaskUser
 from sensors.util import Util
 
-api = Blueprint('sensors_api', __name__, url_prefix='/api/')
+api = Blueprint('api', __name__, url_prefix='/api/')
 
 login_manager = LoginManager()
 
