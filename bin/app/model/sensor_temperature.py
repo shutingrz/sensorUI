@@ -5,8 +5,7 @@ from app.util import Util
 from datetime import datetime, timedelta
 
 from app import db
-from app.db.orm.device import Device
-from app.db.orm.sensor_temperature import SensorTemperature
+from app.db.orm import Device, SensorTemperature
 
 class SensorTemperatureModel(object):
 

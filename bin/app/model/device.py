@@ -4,11 +4,7 @@ import sqlalchemy
 from app.util import Util
 
 from app import db
-from app.db.orm.authentication import Authentication
-from app.db.orm.user import User
-from app.db.orm.device import Device
-from app.db.orm.sensor_type import SensorType
-
+from app.db.orm import Authentication, User, Device, SensorType
 
 class DeviceModel(object):
 

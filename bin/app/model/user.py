@@ -3,8 +3,7 @@ import sqlalchemy
 from app import db
 from app.util import Util
 from app.model.flask_user import User as FlaskUser
-from app.db.orm.authentication import Authentication
-from app.db.orm.user import User
+from app.db.orm import Authentication, User
 
 
 
@@ -23,7 +22,6 @@ class UserModel(object):
                 "user_isExist: Unknown error: %s" % exc)
             return None, 199
 
-        #if user is None:
         if user is None:
             return False, 0
         else:   

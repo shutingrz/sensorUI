@@ -2,7 +2,7 @@ import sqlalchemy
 from flask import current_app
 
 from app import db
-from app.db.orm.sensor_type import SensorType
+from app.db.orm import SensorType
 
 
 class SensorModel(object):
