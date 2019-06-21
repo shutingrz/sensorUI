@@ -71,8 +71,14 @@ class UserModel(object):
     def user_login(self, username, password):
 
         try:
-            user_hash = db.session.query(User.user_hash).filter(
-                User.username == username).first().user_hash
+            user_result = db.session.query(User).filter(
+                User.username == username).first()
+
+            if not user_result:
+                return None, 100
+
+            user_hash = user_result.user_hash
+
             result = db.session.query(Authentication.hmac_key, Authentication.encrypted_password).filter(
                 Authentication.user_hash == user_hash).first()
         except Exception as exc:

@@ -57,7 +57,7 @@ def login():
         user, code = model.user_login(
             form.username.data, form.password.data)
 
-        if user:
+        if code == 0 and user:
             login_user(user)
             return redirect(request.args.get('next') or url_for("webui.device_list"))
         else:

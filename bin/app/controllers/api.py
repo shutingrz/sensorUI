@@ -54,15 +54,12 @@ def api_login():
     model = UserModel()
     user, code = model.user_login(username, password)
 
-    if user is None:
-        return jsonify(_makeErrorMessage(code))
+    if code == 0 and user:
+        login_user(user)
+        msg = "login successful"
+        return jsonify(_makeResponseMessage(msg))
     else:
-        if user:
-            login_user(user)
-            msg = "login successful"
-            return jsonify(_makeResponseMessage(msg))
-        else:
-            return jsonify(_makeErrorMessage(21))
+        return jsonify(_makeErrorMessage(21))
 
 
 @api.route('/logout')
