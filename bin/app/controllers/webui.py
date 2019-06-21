@@ -111,25 +111,27 @@ def device_list():
     deviceModel = DeviceModel()
     sensorModel = SensorModel()
 
-    msg, code = deviceModel.device_list(current_user.user_hash)
+    sensorTypes, code = sensorModel.getSensorType()
+    if code != ResultCode.Success:
+        return render_template('webui/device_register.html',
+            description="センサータイプの取得に失敗しました: %s" % sensorTypes,
+            form=form)
 
-    if code != 0:
+    devices, code = deviceModel.device_list(current_user.user_hash)
+
+    if code != ResultCode.Success:
         return render_template('webui/device_list.html', description="デバイスの取得に失敗しました")
-    else:
-        devices = msg["devices"]
 
-        sensorTypes, code = sensorModel.getSensorType()
-        if code == 0:
-            for device in devices:
-                # sensor_typeに対応する名前を取得
-                for type_data in sensorTypes:
-                    if device["sensor_type"] == type_data["id"]:
-                        device["sensor_type_name"] = type_data["name"]
+    if len(devices) == 0:
+        return render_template('webui/device_list.html', description="デバイスが登録されていません")
+    
+    # sensor_typeに対応する名前を取得
+    for device in devices:
+        for type_data in sensorTypes:
+            if device["sensor_type"] == type_data["id"]:
+                device["sensor_type_name"] = type_data["name"]
 
-        if len(devices) == 0:
-            return render_template('webui/device_list.html', description="デバイスが登録されていません")
-        else:
-            return render_template('webui/device_list.html', devices=devices)
+    return render_template('webui/device_list.html', devices=devices)
 
 
 @webui.route('/register-device', methods=("GET", "POST"))

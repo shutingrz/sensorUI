@@ -387,7 +387,7 @@ class TestAccountControl(unittest.TestCase):
         devices = json_data["response"]
 
         isExist = False
-        for device in devices["devices"]:
+        for device in devices:
             if device_id in device["device_id"]:
                 isExist = True
             
@@ -414,7 +414,7 @@ class TestAccountControl(unittest.TestCase):
         devices = json_data["response"]
 
         isExist = False
-        for device in devices["devices"]:
+        for device in devices:
             if device_id in device["device_id"]:
                 isExist = True
             

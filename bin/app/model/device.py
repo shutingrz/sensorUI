@@ -48,7 +48,7 @@ class DeviceModel(object):
             devices.append(device_dict)
 
             
-        msg = {"devices": devices}
+        msg = devices
 
         return msg, ResultCode.Success
 
