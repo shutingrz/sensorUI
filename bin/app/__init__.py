@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from flask import Flask, Blueprint
 from app.controllers.api import api
 from app.controllers.webui import webui
@@ -54,10 +52,3 @@ init_db(app)
 # Migrate対応だが一旦 db.create_all() をする運用とする
 with app.app_context():
 	db.create_all()
-
-
-if __name__ == '__main__':
-    app.run(debug=app.config["DEBUG_MODE"], 
-            host=app.config['LISTEN'], 
-            port=app.config['PORT']
-        )
