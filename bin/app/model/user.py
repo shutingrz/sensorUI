@@ -2,7 +2,7 @@ from flask import current_app
 import sqlalchemy
 from app import db
 from app.util import Util
-from app.model.flask_user import User as FlaskUser
+from app.model.flask_user import FlaskUser
 from app.db.orm import Authentication, User
 
 

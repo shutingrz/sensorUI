@@ -1,7 +1,7 @@
 
 # flask-login 用クラス
 
-class User(object):
+class FlaskUser(object):
     def __init__(self, user_hash, username=None):
         self.user_hash = user_hash
 

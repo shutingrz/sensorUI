@@ -3,11 +3,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from flask_wtf import FlaskForm
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from app.controllers import forms
-from app.model.user import UserModel
-from app.model.device import DeviceModel
-from app.model.sensor import SensorModel
-from app.model.sensor_temperature import SensorTemperatureModel
-from app.model.flask_user import User as FlaskUser
+from app.model import FlaskUser, SensorModel, UserModel, DeviceModel, SensorTemperatureModel
 from app.util import Util
 
 webui = Blueprint('webui', __name__)

@@ -1,10 +1,6 @@
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from flask_login import LoginManager, login_user, login_required, current_user, logout_user
-from app.model.sensor import SensorModel
-from app.model.user import UserModel
-from app.model.device import DeviceModel
-from app.model.sensor_temperature import SensorTemperatureModel
-from app.model.flask_user import User as FlaskUser
+from app.model import FlaskUser, SensorModel, UserModel, DeviceModel, SensorTemperatureModel
 from app.util import Util
 
 api = Blueprint('api', __name__)
