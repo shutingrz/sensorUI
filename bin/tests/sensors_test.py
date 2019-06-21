@@ -1,13 +1,9 @@
 import unittest
-import os
-import sys
 import json
 import tempfile
-from flask import Flask
-import subprocess
-import app as sensors_app
 import time
-from app.db import init_db
+
+import app as sensors_app
 from app import db
 
 # データベースの準備
@@ -16,7 +12,7 @@ tempDBPath = tempDB[1]
 dburl = "sqlite:///" + tempDBPath
 
 app = sensors_app.create_app(dburl)
-init_db(app)
+db.init_db(app)
 
 with app.app_context():
 	db.create_all()
