@@ -1,13 +1,13 @@
 from flask import current_app
 import sqlalchemy
 
-from sensors.util import Util
+from app.util import Util
 
-from sensors import db
-from sensors.db.orm.authentication import Authentication
-from sensors.db.orm.user import User
-from sensors.db.orm.device import Device
-from sensors.db.orm.sensor_type import SensorType
+from app import db
+from app.db.orm.authentication import Authentication
+from app.db.orm.user import User
+from app.db.orm.device import Device
+from app.db.orm.sensor_type import SensorType
 
 
 class DeviceModel(object):

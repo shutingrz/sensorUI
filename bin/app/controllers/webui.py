@@ -2,13 +2,13 @@ from flask import Blueprint, url_for, request, redirect, render_template, curren
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
-from sensors.controllers import forms
-from sensors.model.user import UserModel
-from sensors.model.device import DeviceModel
-from sensors.model.sensor import SensorModel
-from sensors.model.sensor_temperature import SensorTemperatureModel
-from sensors.model.flask_user import User as FlaskUser
-from sensors.util import Util
+from app.controllers import forms
+from app.model.user import UserModel
+from app.model.device import DeviceModel
+from app.model.sensor import SensorModel
+from app.model.sensor_temperature import SensorTemperatureModel
+from app.model.flask_user import User as FlaskUser
+from app.util import Util
 
 webui = Blueprint('webui', __name__, url_prefix='/')
 

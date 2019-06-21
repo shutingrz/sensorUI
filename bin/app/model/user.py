@@ -1,10 +1,10 @@
 from flask import current_app
 import sqlalchemy
-from sensors import db
-from sensors.util import Util
-from sensors.model.flask_user import User as FlaskUser
-from sensors.db.orm.authentication import Authentication
-from sensors.db.orm.user import User
+from app import db
+from app.util import Util
+from app.model.flask_user import User as FlaskUser
+from app.db.orm.authentication import Authentication
+from app.db.orm.user import User
 
 
 

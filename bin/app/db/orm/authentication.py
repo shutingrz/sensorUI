@@ -1,4 +1,4 @@
-from sensors import db
+from app import db
 
 class Authentication(db.Model):
 

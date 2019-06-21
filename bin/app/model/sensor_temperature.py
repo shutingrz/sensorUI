@@ -1,12 +1,12 @@
 import sqlalchemy
 from sqlalchemy import desc
 from flask import current_app
-from sensors.util import Util
+from app.util import Util
 from datetime import datetime, timedelta
 
-from sensors import db
-from sensors.db.orm.device import Device
-from sensors.db.orm.sensor_temperature import SensorTemperature
+from app import db
+from app.db.orm.device import Device
+from app.db.orm.sensor_temperature import SensorTemperature
 
 class SensorTemperatureModel(object):
 

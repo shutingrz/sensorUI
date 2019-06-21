@@ -7,8 +7,8 @@ from flask import Flask
 import subprocess
 import app as sensors_app
 import time
-from sensors.db import init_db
-from sensors import db
+from app.db import init_db
+from app import db
 
 # データベースの準備
 tempDB = tempfile.mkstemp()

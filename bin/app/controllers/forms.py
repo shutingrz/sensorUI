@@ -1,4 +1,4 @@
-from sensors.util import Util
+from app.util import Util
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, validators
 

@@ -19,7 +19,7 @@ def init_db(app):
 def create_all():
 	db.create_all()
 
-	from sensors.db.orm.sensor_type import SensorType
+	from app.db.orm.sensor_type import SensorType
 	if db.session.query(SensorType).count() == 0:
 			db.session.add(SensorType(
                 sensor_id=1,
