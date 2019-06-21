@@ -50,21 +50,22 @@ def login():
         return render_template('webui/login.html', form=form)
 
     if request.method == "POST":
-        if form.validate():
-            user, code = model.user_login(
-                form.username.data, form.password.data)
-
-            if user:
-                login_user(user)
-                return redirect(request.args.get('next') or url_for("webui.device_list"))
-            else:
-                return render_template('webui/login.html',
-                login_description="ユーザIDまたはパスワードが違います。",
-                form=form)
-        else:
+        if not form.validate():
             return render_template('webui/login.html',
             login_description="フォームを正しく入力してください。",
             form=form)
+        
+        user, code = model.user_login(
+            form.username.data, form.password.data)
+
+        if user:
+            login_user(user)
+            return redirect(request.args.get('next') or url_for("webui.device_list"))
+        else:
+            return render_template('webui/login.html',
+            login_description="ユーザIDまたはパスワードが違います。",
+            form=form)
+            
 
     return render_template('webui/login.html', form=form)
 
@@ -84,28 +85,30 @@ def user_register():
         return render_template('webui/user_register.html', form=form)
 
     if request.method == "POST":
-        if form.validate():
-            username = form.username.data
-            password = form.password.data
-
-            model = UserModel()
-            if model.user_isExist(username)[0]:
-                return render_template('webui/user_register.html',
-                        register_description="既に同じ名前のユーザが存在します。",
-                        form=form)
-
-            msg, code = model.user_register(username, password)
-
-            if code == 0:
-                return render_template('webui/success_user_register.html')
-            else:
-                return render_template('webui/user_register.html',
-                    register_description="ユーザ登録に失敗しました: %s" % msg,
-                    form=form)
-        else:
+        if not form.validate():
             return render_template('webui/user_register.html',
                 register_description="フォームを正しく入力してください。",
                 form=form)
+
+        
+        username = form.username.data
+        password = form.password.data
+
+        model = UserModel()
+        if model.user_isExist(username)[0]:
+            return render_template('webui/user_register.html',
+                    register_description="既に同じ名前のユーザが存在します。",
+                    form=form)
+
+        msg, code = model.user_register(username, password)
+
+        if code == 0:
+            return render_template('webui/success_user_register.html')
+        else:
+            return render_template('webui/user_register.html',
+                register_description="ユーザ登録に失敗しました: %s" % msg,
+                form=form)
+            
 
 
 @webui.route('/devices')
@@ -154,24 +157,27 @@ def device_register():
         return render_template('webui/device_register.html', form=form)
 
     if request.method == 'POST':
-        if form.validate():
-            device_name = form.device_name.data
-            sensor_type = form.sensor_type.data
-
-            model = DeviceModel()
-
-            msg, code = model.device_register(current_user.user_hash, device_name, sensor_type)
-
-            if code == 0:
-                return redirect(url_for("webui.device_list"))
-            else:
-                return render_template('webui/device_register.html',
-                    description="デバイス登録に失敗しました: %s" % msg,
-                    form=form)            
-        else:
+        if not form.validate():
             return render_template('webui/device_register.html',
                 description="フォームがあかん",
                 form=form)
+
+
+        device_name = form.device_name.data
+        sensor_type = form.sensor_type.data
+
+        model = DeviceModel()
+
+        msg, code = model.device_register(current_user.user_hash, device_name, sensor_type)
+
+        if code == 0:
+            return redirect(url_for("webui.device_list"))
+        else:
+            return render_template('webui/device_register.html',
+                description="デバイス登録に失敗しました: %s" % msg,
+                form=form)            
+        
+            
 
 
 @webui.route('/device/<device_id>')
