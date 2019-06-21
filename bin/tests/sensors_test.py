@@ -105,7 +105,7 @@ class TestUserControl(unittest.TestCase):
 
         # access login required page without session
         rv = self.app.get("/api/devices")
-        self.assertEqual(rv.status_code, 302)
+        self.assertEqual(rv.status_code, 401)
 
         # register
         rv = self.app.get("/api/register/user", query_string=dict(

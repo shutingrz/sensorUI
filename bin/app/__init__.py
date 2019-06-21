@@ -42,8 +42,8 @@ def create_app(DBURL=None):
     Util.MaxUserPassLength = app.config["MAX_USERPASS_LENGTH"]
     Util.DebugMode = app.config["DEBUG_MODE"]
 
-    app.register_blueprint(api)
-    app.register_blueprint(webui)
+    app.register_blueprint(webui, url_prefix='/')
+    app.register_blueprint(api, url_prefix='/api/')
 
     return app
 

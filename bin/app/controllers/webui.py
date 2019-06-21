@@ -10,7 +10,7 @@ from app.model.sensor_temperature import SensorTemperatureModel
 from app.model.flask_user import User as FlaskUser
 from app.util import Util
 
-webui = Blueprint('webui', __name__, url_prefix='/')
+webui = Blueprint('webui', __name__)
 
 login_manager = LoginManager()
 
