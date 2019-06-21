@@ -11,10 +11,6 @@ api = Blueprint('sensors_api', __name__, url_prefix='/api/')
 
 login_manager = LoginManager()
 
-# @api.record_once
-# def on_load(state):
-#	login_manager.init_app(state.app)
-
 
 @login_manager.user_loader
 def load_user(user_hash):

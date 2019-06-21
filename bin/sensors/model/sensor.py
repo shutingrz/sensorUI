@@ -1,7 +1,5 @@
 import sqlalchemy
-from sqlalchemy import or_
 from flask import current_app
-from sensors.util import Util
 
 from sensors import db
 from sensors.db.orm.sensor_type import SensorType

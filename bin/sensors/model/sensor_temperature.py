@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy import or_, desc
+from sqlalchemy import desc
 from flask import current_app
 from sensors.util import Util
 from datetime import datetime, timedelta

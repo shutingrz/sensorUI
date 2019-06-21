@@ -1,7 +1,6 @@
 from flask import Blueprint, url_for, request, redirect, render_template, current_app
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, validators
 from flask import Blueprint, jsonify, url_for, request, redirect, current_app
 from sensors.controllers import forms
 from sensors.model.user import UserModel
@@ -177,8 +176,6 @@ def device_register():
                 description="デバイス登録に失敗しました: %s" % msg,
                 form=form)            
         
-            
-
 
 @webui.route('/device/<device_id>')
 @login_required
